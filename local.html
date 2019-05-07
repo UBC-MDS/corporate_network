@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <link type="text/css" rel="stylesheet" href="css/style.css"/>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <script type="text/javascript" src="d3/d3.js"></script>
+    <script type="text/javascript" src="d3/d3.layout.js"></script>
+    <script type="text/javascript" src="jquery-1.9.1.min.js"></script>
+    <style type="text/css">
+
+.node circle {
+  cursor: pointer;
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font-size: 11px;
+}
+
+path.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+    </style>
+  </head>
+  <body>
+    <center>
+	<font size="4">Relationship Map for 
+		<a id="crunchbase" target=_blank>
+		<b id="footer_text"></b>
+		</a>
+		( <font size="3">proximity measure: <b id="footer_metric"></b></font>
+		)
+	</font><br>
+	<font size="3">
+	Change measure: 
+	<a id="competition" href="">(1) Competition</a>
+	<a id="ownership" href="">(2) Ownership</a>
+	<a id="agreement" href="">(3) Agreements</a>
+  <a id="legal" href="">(4) Legal Suits</a>
+  <a id="personal" href="">(4) Personal Ties</a>
+	</font><br>
+	<font id="hint" size="3" color="grey">click dark circle to change the root</font>
+        <!--div class="hint">click or option-click to expand or collapse</div-->
+    </center>
+    <div id="body">
+      <h2 align="center" id="loading_message">Data is loading now... </h2>
+      <div id="footer">
+        <!--p id="footer_text2">d3.layout.tree</p>
+        <div class="hint">click or option-click to expand or collapse</div-->
+      </div>
+    </div>
+    <script type="text/javascript">
+
+// get parameters 
+function getParameterByName(name)
+{
+  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+  var regexS = "[\\?&]" + name + "=([^&#]*)";
+  var regex = new RegExp(regexS);
+  var results = regex.exec(window.location.search);
+  if(results == null)
+    if (name == 'company'){
+        return 'microsoft';
+    }
+    else if (name == "month"){
+        return firstDayInPreviousMonth(new Date()).getMonth() + 1;
+    }
+    else if (name == "metric"){
+        return "competition";
+    }
+    else if (name == "distance"){
+        return 0.1;
+    }
+    else if (name == "similarity"){
+        return 0;
+    }
+    else{
+        return "";
+    }
+  else
+    return decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function getJsonFileName(companyId){
+	var json_path = "";
+	var base_url = "";
+	// Gene: get json data
+	if (getParameterByName("metric") == "competition"){
+		json_path = "./json.competition/converted/";
+		base_url = "./local.html?metric=competition&company=";
+	}
+	else if (getParameterByName("metric") == "ownership"){
+		json_path = "./json.ownership/converted/";
+		base_url = "./local.html?metric=ownership&company=";
+	}
+	else if (getParameterByName("metric") == "agreement"){
+		json_path = "./json.agreement/converted/";
+		base_url = "./local.html?metric=agreement&company=";
+  }
+  else if (getParameterByName("metric") == "legal"){
+		json_path = "./json.legal/converted/";
+		base_url = "./local.html?metric=legal&company=";
+	}
+	else if (getParameterByName("metric") == "personal"){
+		json_path = "./json.personal/converted/";
+		base_url = "./local.html?metric=personal&company=";
+	}
+	else {
+		json_path = "./json/converted/";
+		base_url = "./local.html?company=";
+	}
+	var companyJsonFile = json_path + companyId + ".json";
+	console.log(companyJsonFile);
+
+	return companyJsonFile;
+}
+
+
+var metric = "";
+if (getParameterByName("metric") == "competition"){
+	metric = "competition";
+}
+else if (getParameterByName("metric") == "ownership"){
+	metric = "common ownership";
+}
+else if (getParameterByName("metric") == "agreement"){
+  metric = "agreement";
+}
+else if (getParameterByName("metric") == "legal"){
+  metric = "legal suit";
+}
+else if (getParameterByName("metric") == "personal"){
+	metric = "personal connection";
+}
+
+// proximity
+document.getElementById('competition').setAttribute('href', "./local.html?metric=competition&company=" + getParameterByName("company"));
+document.getElementById('ownership').setAttribute('href', "./local.html?metric=ownership&company=" + getParameterByName("company"));
+document.getElementById('agreement').setAttribute('href', "./local.html?metric=agreement&company=" + getParameterByName("company"));
+document.getElementById('legal').setAttribute('href', "./local.html?metric=legal&company=" + getParameterByName("company"));
+document.getElementById('personal').setAttribute('href', "./local.html?metric=personal&company=" + getParameterByName("company"));
+
+
+if ( check_json_exists_target() ) {
+
+	var jsonData = $.ajax({
+		url: getJsonFileName(getParameterByName("company")),
+		data: "",
+		dataType: "json",
+		async: false
+		}).responseText;
+
+	jsonParsedData = JSON.parse(jsonData);
+	//console.log(jsonParsedData["nodes"][0]);
+	//console.log(jsonParsedData["nodes"]);
+	var companyName = jsonParsedData["name"];
+	//console.log(jsonParsedData);
+
+	// change HTML title
+	document.title = "Relationship Mapper for " + companyName;
+	document.getElementById('footer_text').innerHTML = companyName;
+	document.getElementById('footer_metric').innerHTML = metric;
+
+}
+else {
+
+	document.title = "Relationship Mapper is not ready for " + getParameterByName("company");
+	document.getElementById('footer_text').innerHTML = getParameterByName("company");
+        document.getElementById('footer_metric').innerHTML = metric;
+	document.getElementById('hint').innerHTML = "";
+	document.getElementById('loading_message').innerHTML = "Data is not available for this company in this proximity measure.";
+}
+
+
+
+// Tree 
+
+var m = [20, 120, 20, 120],
+    w = 1280 - m[1] - m[3],
+    h = 700 - m[0] - m[2],
+    i = 0,
+    root;
+
+var tree = d3.layout.tree()
+    .size([h, w]);
+
+var diagonal = d3.svg.diagonal()
+    .projection(function(d) { return [d.y, d.x]; });
+
+var vis = d3.select("#body").append("svg:svg")
+    .attr("width", w + m[1] + m[3])
+    .attr("height", h + m[0] + m[2])
+  .append("svg:g")
+    .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+rootJsonFileName = getJsonFileName(getParameterByName("company"));
+d3.json(rootJsonFileName, function(json) {
+//d3.json(appJsonFile, function(error, json) {
+  console.log(json);
+  root = json;
+  for (var i in root.children){
+    if(root.children[i] != undefined && root.children[i]) {
+	    console.log(root.children[i]);
+	    if( root.children[i].similarity < getParameterByName("similarity")){
+	       console.log(root.children[i].similarity);
+	       root.children.splice(i, 1);
+	    }
+    }
+  }
+  console.log(root.children.length);
+
+  //console.log(rootJsonFileName);
+  //console.log("root:", root);
+
+  root.x0 = h / 2;
+  root.y0 = 0;
+
+  function toggleAll(d) {
+    if (d.children) {
+      d.children.forEach(toggleAll);
+      toggle(d);
+    }
+  }
+
+  // Initialize the display to show a few nodes.
+  root.children.forEach(toggleAll);
+  
+  for(var i in root.children){
+	toggle(root.children[i]);
+  }
+  //toggle(root.children[1].children[2]);
+  //toggle(root.children[9]);
+  //toggle(root.children[9].children[0]);
+
+  update(root);
+
+  document.getElementById('loading_message').innerHTML = "";
+
+});
+
+
+function get_base_url(){
+
+	var base_url = "";
+	if (getParameterByName("metric") == "competition"){
+		base_url = "./local.html?metric=competition&company=";
+	}
+	else if (getParameterByName("metric") == "ownership"){
+		base_url = "./local.html?metric=ownership&company=";
+	}
+	else if (getParameterByName("metric") == "agreement"){
+		base_url = "./local.html?metric=agreement&company=";
+	}
+	else if (getParameterByName("metric") == "legal"){
+		base_url = "./local.html?metric=legal&company=";
+  }
+  else if (getParameterByName("metric") == "personal"){
+		base_url = "./local.html?metric=personal&company=";
+	}
+	else {
+		base_url = "./local.html?app=";
+	}
+	return base_url;
+}
+
+function get_json_path(){
+
+	var json_path = " ";
+        if (getParameterByName("metric") == "competition"){
+                json_path = "./json.competition/converted/";
+        }
+        else if (getParameterByName("metric") == "ownership"){
+                json_path = "./json.ownership/converted/";
+        }
+        else if (getParameterByName("metric") == "agreement"){
+                json_path = "./json.agreement/converted/";
+        }
+        else if (getParameterByName("metric") == "legal"){
+                json_path = "./json.legal/converted/";
+        }
+        else if (getParameterByName("metric") == "personal"){
+                json_path = "./json.personal/converted/";
+        }
+        else {
+                json_path = "./json/";
+        }
+        return json_path;
+}
+
+function fileExists(url)
+{
+    var http = new XMLHttpRequest();
+    http.open('HEAD', url, false);
+    http.send();
+    return http.status!=404;
+}
+
+function check_json_exists_target(){
+
+        var base_url = get_base_url();
+        var json_path = get_json_path();
+        var url = json_path + getParameterByName("company") + ".json";
+        //console.log(url);
+        return fileExists(url);
+}
+
+function check_json_exists(d){
+
+	var base_url = get_base_url();
+	var json_path = get_json_path();
+	var url = json_path + d.permalink + ".json";
+	//console.log(url);
+	return fileExists(url);
+
+	/*
+        // check if json file is ready
+        $.ajax({
+                url: json_path + d.id + ".json",
+                success: function(data){
+			json_exist = 1;
+			console.log("data exists for " + d.name);
+                },
+                error: function(data){
+			json_exist = 0;
+			console.log("no data for " + d.name);
+                },
+        })
+	return json_exist;
+	*/
+}
+
+function change_root(d, i){
+
+	if (d.permalink == getParameterByName("company")){
+		return;
+	}
+
+
+	var base_url = get_base_url();
+	var json_path = get_json_path();
+	var url = json_path + d.permalink + ".json";
+	if (fileExists(url)){
+		window.location.href = base_url + d.permalink;
+		/*
+		var answer = confirm("You want to move to AppMap for " + d.name + "?");
+		if (answer) {
+			//alert("Moving to AppMap for " + d.name);
+			window.location.href = base_url + d.permalink;
+		}
+		*/
+	}
+	else{
+		console.log("no data for " + d.name);
+	}
+
+	/*
+        $.ajax({
+                url: json_path + d.permalink + ".json",
+                success: function(data){
+			var answer = confirm("You want to move to AppMap for " + d.name + "?");
+			if (answer) {
+				//alert("Moving to AppMap for " + d.name);
+				window.location.href = base_url + d.permalink;
+			}
+                },
+                error: function(data){
+                        console.log("no data for " + d.name);
+                },
+        })
+	*/
+}
+
+function update(source) {
+  var duration = d3.event && d3.event.altKey ? 5000 : 500;
+
+  // Compute the new tree layout.
+  var nodes = tree.nodes(root).reverse();
+
+  // Normalize for fixed-depth.
+  nodes.forEach(function(d) { d.y = d.depth * 400; });
+
+  // Update the nodesâ¦
+  var node = vis.selectAll("g.node")
+      .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+  // Enter any new nodes at the parent's previous position.
+  var nodeEnter = node.enter().append("svg:g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+      .on("click", change_root)
+      //.on("dblclick", change_root)
+      //.on("click", function(d) { toggle(d); update(d); });
+      ;
+
+  //console.log(d_children);
+  nodeEnter.append("svg:circle")
+      .attr("r", 1e-6)
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
+      //.style("fill", function(d) { return check_json_exists(d) ? "lightsteelblue" : "#fff"; })
+      //.style("fill", function(d) { return 1 ? "lightsteelblue" : "#fff"; })
+      ;
+
+  nodeEnter.append("svg:text")
+      .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+      .attr("dy", ".35em")
+      .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+      .text(function(d) { return d.name; })
+      .style("fill-opacity", 1e-6);
+
+  // Transition nodes to their new position.
+  var nodeUpdate = node.transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+  nodeUpdate.select("circle")
+      .attr("r", 4.5)
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
+      .style("fill", function(d) { return check_json_exists(d) ? "lightsteelblue" : "#fff"; })
+      ;
+
+  nodeUpdate.select("text")
+      .style("fill-opacity", 1);
+
+  // Transition exiting nodes to the parent's new position.
+  var nodeExit = node.exit().transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+      .remove();
+
+  nodeExit.select("circle")
+      .attr("r", 1e-6);
+
+  nodeExit.select("text")
+      .style("fill-opacity", 1e-6);
+
+  // Update the linksâ¦
+  var link = vis.selectAll("path.link")
+      .data(tree.links(nodes), function(d) { return d.target.id; });
+
+  // Enter any new links at the parent's previous position.
+  link.enter().insert("svg:path", "g")
+      .attr("class", "link")
+      .attr("d", function(d) {
+        var o = {x: source.x0, y: source.y0};
+        return diagonal({source: o, target: o});
+      })
+    .transition()
+      .duration(duration)
+      .attr("d", diagonal);
+
+  // Transition links to their new position.
+  link.transition()
+      .duration(duration)
+      .attr("d", diagonal);
+
+  // Transition exiting nodes to the parent's new position.
+  link.exit().transition()
+      .duration(duration)
+      .attr("d", function(d) {
+        var o = {x: source.x, y: source.y};
+        return diagonal({source: o, target: o});
+      })
+      .remove();
+
+  // Stash the old positions for transition.
+  nodes.forEach(function(d) {
+    d.x0 = d.x;
+    d.y0 = d.y;
+  });
+}
+
+// Toggle children.
+function toggle(d) {
+  if (d.children) {
+    d._children = d.children;
+    d.children = null;
+    //console.log("collapse:" + d.name);
+
+
+  } else {
+    d.children = d._children;
+    d._children = null;
+    //console.log("expand:" + d.name);
+  }
+}
+
+    </script>
+  </body>
+</html>
+
