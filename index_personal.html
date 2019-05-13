@@ -143,31 +143,29 @@ var searchText = url.param('search') || '';
 $(document).ready(function() {
   
   var oTable = $('#company_list').dataTable( {
-    "sDom": '<"search"f><lip>rt<lip>',
-    "bProcessing": true,
-    "sAjaxSource": './venture_list.datatable.personal.json',
-    "aoColumns": [
-      { "sTitle": "permalink", "mData": "permalink", "sWidth": "200px" },
-      { "sTitle": "Name", "mData": "name", "sWidth": "300px"},
-      { "sTitle": "Category", "mData": "category", "sWidth": "30px" },
-      { "sTitle": "City", "mData": "city", "sWidth": "100px" },
-      { "sTitle": "State", "mData": "state", "sWidth": "30px" },
-    ],
-    "oLanguage": {
-      "sSearch": "",
-      "sZeroRecords": "No matching records found.<br/>"
-    },
-    "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-      /* Append the grade to the default row class name */
-      $('td:eq(0)', nRow).html( '<a href="'+mapPageURL+'?metric=personal&company='+aData['permalink']+'" target=_blank>'+aData['permalink']+'</a>' );
-    },
-    "fnInitComplete": function(oSettings, json) {
-      $("#company_list th:eq(5)").each( function ( i ) {
-        this.innerHTML += '<br />'+fnCreateSelect( oTable.fnGetColumnData('Count') );
-        $('select', this).change( function () {
-          oTable.fnFilter( $(this).val(), 5);
+      "sDom": '<"search"f><lip>rt<lip>',
+      "bProcessing": true,
+      "sAjaxSource": './network.datatable.personal.json',
+      "aoColumns": [
+      { "sTitle": "Permalink", "mData": "permalink", "sWidth": "200px", sDefaultContent: "n/a" },
+        { "sTitle": "Name", "mData": "org_name", "sWidth": "300px", sDefaultContent: "n/a"},
+        { "sTitle": "Sector Number", "mData": "sector_sic", "sWidth": "30px" , sDefaultContent: "n/a"}
+      ],
+      "oLanguage": {
+        "sSearch": "",
+        "sZeroRecords": "No matching records found.<br/>"
+      },
+      "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+        /* Append the grade to the default row class name */
+        $('td:eq(0)', nRow).html( '<a href="'+mapPageURL+'?metric=personal&year=2013&company='+aData['permalink']+'" target=_blank>'+aData['permalink']+'</a>' );
+      },
+      "fnInitComplete": function(oSettings, json) {
+        $("#company_list th:eq(5)").each( function ( i ) {
+          this.innerHTML += '<br />'+fnCreateSelect( oTable.fnGetColumnData('Count') );
+          $('select', this).change( function () {
+            oTable.fnFilter( $(this).val(), 5);
+          } );
         } );
-      } );
 
 /*
       $("#company_list th:eq(3)").each( function ( i ) {

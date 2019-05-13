@@ -3,11 +3,14 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
     <link type="text/css" rel="stylesheet" href="css/style.css"/>
-    <link rel="icon" type="image/png" href="images/favicon.png">
     <script type="text/javascript" src="d3/d3.js"></script>
     <script type="text/javascript" src="d3/d3.layout.js"></script>
-    <script type="text/javascript" src="jquery-1.9.1.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
     <style type="text/css">
+
+
 
 .node circle {
   cursor: pointer;
@@ -29,33 +32,49 @@ path.link {
     </style>
   </head>
   <body>
-    <center>
-	<font size="4">Relationship Map for 
-		<a id="crunchbase" target=_blank>
+    
+    <BR><BR>
+	<font size="4">Corporate Network for 
 		<b id="footer_text"></b>
-		</a>
-		( <font size="3">proximity measure: <b id="footer_metric"></b></font>
-		)
-	</font><br>
-	<font size="3">
-	Change measure: 
-	<a id="competition" href="">(1) Competition</a>
-	<a id="ownership" href="">(2) Ownership</a>
-	<a id="agreement" href="">(3) Agreements</a>
-  <a id="legal" href="">(4) Legal Suits</a>
-  <a id="personal" href="">(4) Personal Ties</a>
-	</font><br>
-	<font id="hint" size="3" color="grey">click dark circle to change the root</font>
+		</a> <BR>
+        <font size="4">Relationship Type: <b id="footer_metric"></b></font>,  <font size="4">Year: <b id="footer_year"></b></font>
+	</font><BR><BR>
+	<font size="4">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Relationship Type
+        <span class="caret"></span></button>
+        <ul class="dropdown-menu">
+            <li><a id="competition" href="">Competition</a></li>
+            <li><a id="ownership" href="">Ownership</a></li>
+            <li><a id="agreement" href="">Agreements</a></li>
+            <li><a id="legal" href="">Legal Suits</a></li>
+            <li><a id="personal" href="">Personal Ties</a></li>
+        </ul>
+    </div> 
+
+    <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Filing Year
+            <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                <li><a id="2013" href="">2013</a></li>
+                <li><a id="2014" href="">2014</a></li>
+            </ul>
+        </div> 
+
+    <BR>
+	<font id="hint" size="3" color="grey"><I>click dark circle to change the root</I></font>
         <!--div class="hint">click or option-click to expand or collapse</div-->
-    </center>
+    
     <div id="body">
-      <h2 align="center" id="loading_message">Data is loading now... </h2>
+        <!-- might need to change this loading message-->
+      <h2 align="center" id="loading_message">Data is not available for this company in this filing year... </h2>
       <div id="footer">
         <!--p id="footer_text2">d3.layout.tree</p>
         <div class="hint">click or option-click to expand or collapse</div-->
       </div>
     </div>
     <script type="text/javascript">
+
 
 // get parameters 
 function getParameterByName(name)
@@ -74,11 +93,8 @@ function getParameterByName(name)
     else if (name == "metric"){
         return "competition";
     }
-    else if (name == "distance"){
-        return 0.1;
-    }
-    else if (name == "similarity"){
-        return 0;
+    else if (name == "year"){
+        return '2016';
     }
     else{
         return "";
@@ -93,34 +109,33 @@ function getJsonFileName(companyId){
 	// Gene: get json data
 	if (getParameterByName("metric") == "competition"){
 		json_path = "./json.competition/converted/";
-		base_url = "./local.html?metric=competition&company=";
+		base_url = "./local.html?metric=competition";
 	}
 	else if (getParameterByName("metric") == "ownership"){
 		json_path = "./json.ownership/converted/";
-		base_url = "./local.html?metric=ownership&company=";
+		base_url = "./local.html?metric=ownership";
 	}
 	else if (getParameterByName("metric") == "agreement"){
 		json_path = "./json.agreement/converted/";
-		base_url = "./local.html?metric=agreement&company=";
-  }
-  else if (getParameterByName("metric") == "legal"){
-		json_path = "./json.legal/converted/";
-		base_url = "./local.html?metric=legal&company=";
+		base_url = "./local.html?metric=agreement";
+    }
+    else if (getParameterByName("metric") == "legal"){
+            json_path = "./json.legal/converted/";
+		base_url = "./local.html?metric=legal";
 	}
 	else if (getParameterByName("metric") == "personal"){
 		json_path = "./json.personal/converted/";
-		base_url = "./local.html?metric=personal&company=";
+		base_url = "./local.html?metric=personal";
 	}
 	else {
 		json_path = "./json/converted/";
 		base_url = "./local.html?company=";
 	}
-	var companyJsonFile = json_path + companyId + ".json";
+	var companyJsonFile = json_path + "/"+year+"/" + companyId + ".json";
 	console.log(companyJsonFile);
 
 	return companyJsonFile;
 }
-
 
 var metric = "";
 if (getParameterByName("metric") == "competition"){
@@ -139,12 +154,17 @@ else if (getParameterByName("metric") == "personal"){
 	metric = "personal connection";
 }
 
+var year = getParameterByName("year");
+
 // proximity
-document.getElementById('competition').setAttribute('href', "./local.html?metric=competition&company=" + getParameterByName("company"));
-document.getElementById('ownership').setAttribute('href', "./local.html?metric=ownership&company=" + getParameterByName("company"));
-document.getElementById('agreement').setAttribute('href', "./local.html?metric=agreement&company=" + getParameterByName("company"));
-document.getElementById('legal').setAttribute('href', "./local.html?metric=legal&company=" + getParameterByName("company"));
-document.getElementById('personal').setAttribute('href', "./local.html?metric=personal&company=" + getParameterByName("company"));
+document.getElementById('competition').setAttribute('href', "./local.html?metric=competition&year="+ getParameterByName("year") +"&company=" + getParameterByName("company"));
+document.getElementById('ownership').setAttribute('href', "./local.html?metric=ownership&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
+document.getElementById('agreement').setAttribute('href', "./local.html?metric=agreement&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
+document.getElementById('legal').setAttribute('href', "./local.html?metric=legal&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
+document.getElementById('personal').setAttribute('href', "./local.html?metric=personal&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
+// added year
+document.getElementById('2013').setAttribute('href', "./local.html?metric=competition&year=2013&company=" + getParameterByName("company"))
+document.getElementById('2014').setAttribute('href', "./local.html?metric=competition&year=2014&company=" + getParameterByName("company"))
 
 
 if ( check_json_exists_target() ) {
@@ -165,14 +185,17 @@ if ( check_json_exists_target() ) {
 	// change HTML title
 	document.title = "Relationship Mapper for " + companyName;
 	document.getElementById('footer_text').innerHTML = companyName;
-	document.getElementById('footer_metric').innerHTML = metric;
+    // capitalized relationship type
+	document.getElementById('footer_metric').innerHTML = metric.charAt(0).toUpperCase() + metric.slice(1);
+    document.getElementById('footer_year').innerHTML = year;
 
 }
 else {
 
 	document.title = "Relationship Mapper is not ready for " + getParameterByName("company");
 	document.getElementById('footer_text').innerHTML = getParameterByName("company");
-        document.getElementById('footer_metric').innerHTML = metric;
+        document.getElementById('footer_metric').innerHTML = metric.charAt(0).toUpperCase() + metric.slice(1);
+        document.getElementById('footer_year').innerHTML = year;
 	document.getElementById('hint').innerHTML = "";
 	document.getElementById('loading_message').innerHTML = "Data is not available for this company in this proximity measure.";
 }
@@ -249,19 +272,19 @@ function get_base_url(){
 
 	var base_url = "";
 	if (getParameterByName("metric") == "competition"){
-		base_url = "./local.html?metric=competition&company=";
+		base_url = "./local.html?metric=competition&year="+year+"&company=";
 	}
 	else if (getParameterByName("metric") == "ownership"){
-		base_url = "./local.html?metric=ownership&company=";
+		base_url = "./local.html?metric=ownership&year="+year+"&company=";
 	}
 	else if (getParameterByName("metric") == "agreement"){
-		base_url = "./local.html?metric=agreement&company=";
+		base_url = "./local.html?metric=agreement&year="+year+"&company=";
 	}
 	else if (getParameterByName("metric") == "legal"){
-		base_url = "./local.html?metric=legal&company=";
+		base_url = "./local.html?metric=legal&year="+year+"&company=";
   }
   else if (getParameterByName("metric") == "personal"){
-		base_url = "./local.html?metric=personal&company=";
+		base_url = "./local.html?metric=personal&year="+year+"&company=";
 	}
 	else {
 		base_url = "./local.html?app=";
@@ -375,6 +398,8 @@ function change_root(d, i){
         })
 	*/
 }
+
+
 
 function update(source) {
   var duration = d3.event && d3.event.altKey ? 5000 : 500;
@@ -492,5 +517,6 @@ function toggle(d) {
 
     </script>
   </body>
+
 </html>
 
