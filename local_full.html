@@ -8,14 +8,14 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-    <script src="https://raw.githubusercontent.com/susielu/d3-legend/master/d3-legend.min.js"></script>
+    <link rel="stylesheet"  href="css/legends.css">
     <style type="text/css">
     
 
 .node circle {
   cursor: pointer;
   fill: lightblue;
-  stroke: GhostWhite;
+  stroke: WhiteSmoke;
   stroke-width: 1px;
 }
 .node text {
@@ -31,6 +31,7 @@ path.link {
   fill:white;
   stroke:black;
   opacity:0.8;}
+  
 
 
 </style>
@@ -42,7 +43,7 @@ path.link {
 		<b id="footer_text"></b>
 		</a> <BR>
         <font size="4">Relationship Type: <b id="footer_metric"></b></font>,  <font size="4">Year: <b id="footer_year"></b></font>
-	</font><BR><BR>
+  </font><BR>
 	<font size="4">
     <div class="dropdown">
         <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Relationship Type
@@ -56,7 +57,6 @@ path.link {
             <li><a id="full" href="">All Relationships</a></li>
         </ul>
     </div> 
-
     <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Filing Year
             <span class="caret"></span></button>
@@ -65,10 +65,14 @@ path.link {
                 <li><a id="2014" href="">2014</a></li>
             </ul>
         </div> 
-
-    <BR>
-	<font id="hint" size="3" color="grey"><I>click circle to change the root</I></font>
-        <!--div class="hint">click or option-click to expand or collapse</div-->
+      <div id="legend2">
+        <div class="legend2"> <p class="country-name"><span class="key-dot agreement"></span><font id="hint" size="2">Agreements</font></p> </div>
+        <div class="legend2"> <p class="country-name"><span class="key-dot competition"></span><font id="hint" size="2">Competition</font></p> </div>
+        <div class="legend2"> <p class="country-name"><span class="key-dot legal"></span><font id="hint" size="2">Legal Suit</font></p> </div>
+        <div class="legend2"> <p class="country-name"><span class="key-dot ownership"></span><font id="hint" size="2">Ownership</font></p> </div>
+        <div class="legend2"> <p class="country-name"><span class="key-dot personal"></span><font id="hint" size="2">Personal Ties</font></p> </div>
+      </div>
+  
     </body>
     
     <body>
@@ -173,8 +177,8 @@ document.getElementById('full').setAttribute('href', "./local_full.html?metric=f
 
 
 // added year
-document.getElementById('2013').setAttribute('href', "./local.html?metric=competition&year=2013&company=" + getParameterByName("company"))
-document.getElementById('2014').setAttribute('href', "./local.html?metric=competition&year=2014&company=" + getParameterByName("company"))
+document.getElementById('2013').setAttribute('href', "./local_full.html?metric=full&year=2013&company=" + getParameterByName("company"))
+document.getElementById('2014').setAttribute('href', "./local_full.html?metric=full&year=2014&company=" + getParameterByName("company"))
 if ( check_json_exists_target() ) {
 	var jsonData = $.ajax({
 		url: getJsonFileName(getParameterByName("company")),
@@ -474,8 +478,11 @@ function update(source) {
   nodes.forEach(function(d) {
     d.x0 = d.x;
     d.y0 = d.y;
-  });
-}
+  });       
+
+
+
+};
 // Toggle children.
 function toggle(d) {
   if (d.children) {
@@ -489,45 +496,10 @@ function toggle(d) {
   }
 }
 
-$(function() {
 
 
-var people = [];
-
-$.getJSON('json.competition/converted/2013/microsoft.json', function(data) {
-   // console.log(data.children);
-   var children_text = "";
-       for (var i = 0; i < data.children.length; i++) {
-         tr = $('<tr/>');
-         tr.append("<td>" + data.name + "</td>");
-         tr.append("<td>" + data.year + "</td>");
-                    
-         // children_text = children_text + data.children[i].name + ", ";
-         tr.append("<td>" + data.children[i].name + "</td>");
-         
-         children_text = children_text.substring(0, children_text.length-2); 
-         
-         $('table').append(tr);
-         $(tr).appendTo("#userdata");
-         
-       }
-       // var tblRow = "<tr>" + "<td>" + f.name + "</td>" +
-       //  "<td>" + f.year + "</td>" + "<td>" + f.children + "</td>" + "</tr>"
-       //  $(tblRow).appendTo("#userdata tbody");
-  });
-
-});
-
-;
     </script>
 
-    <table id= "userdata" border="2">
-      <thead>
-                <th>name</th>
-                <th>year</th>
-                <th>children</th>
-            </thead>
-    </table>
   </body>
 
 </html>

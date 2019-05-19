@@ -34,6 +34,15 @@ body {
   width: 1000px;
 }
 
+#circle {
+  width: 5px;
+  height: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 25px;
+  border-radius: 25px;
+  background: red;
+}
+
 
 #footer {
   top: 680px;
