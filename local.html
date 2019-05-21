@@ -494,7 +494,7 @@ $(function() {
 
 var people = [];
 
-$.getJSON('json.competition/converted/2013/microsoft.json', function(data) {
+$.getJSON(get_json_path() + year + "/" + companyName.toLowerCase() + ".json", function(data) {
    // console.log(data.children);
    var children_text = "";
        for (var i = 0; i < data.children.length; i++) {
