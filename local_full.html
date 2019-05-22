@@ -32,7 +32,20 @@ path.link {
   stroke:black;
   opacity:0.8;}
   
+body {
+  overflow-y: scroll;
+  overflow-x: scroll;
+}
 
+thead th { 
+  position: sticky; top: 0;
+  background-color: white; 
+}
+
+.scrolltable {
+    overflow-y:scroll;
+    height: 200px;
+} 
 
 </style>
   </head>
@@ -78,7 +91,7 @@ path.link {
     <body>
     <div id="body">
         <!-- might need to change this loading message-->
-      <h2 align="center" id="loading_message">Data is loading... </h2>
+      <h2 align="center" id="loading_message_1">Data is loading... </h2>
       <div id="footer">
         <!--p id="footer_text2">d3.layout.tree</p>
         <div class="hint">click or option-click to expand or collapse</div-->
@@ -206,9 +219,10 @@ else {
 	document.getElementById('hint').innerHTML = "";
 	document.getElementById('loading_message').innerHTML = "Data is not available for this company in this proximity measure.";
 }
+
 // Tree 
-var m = [20, 120, 20, 120],
-    w = 1280 - m[1] - m[3],
+function addTree(direction, id, msg_id, m) {
+  var w = 1280 - m[1] - m[3],
     h = 700 - m[0] - m[2],
     i = 0,
     root;
@@ -216,12 +230,21 @@ var tree = d3.layout.tree()
     .size([h, w]);
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
-var vis = d3.select("#body").append("svg:svg")
+var vis = d3.select(id).append("svg:svg")
     .attr("width", w + m[1] + m[3])
     .attr("height", h + m[0] + m[2])
+    // .on("wheel.zoom", true)
+    // .attr("viewBox", "0,0,400,400")
   .append("svg:g")
     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
-rootJsonFileName = getJsonFileName(getParameterByName("company"));
+if (direction == "forward") {
+  rootJsonFileName = getJsonFileName(getParameterByName("company"));
+} else {
+  // grab the JSON file associated with the backward tree
+  rootJsonFileName = getJsonFileName(getParameterByName("company"));
+  
+}
+
 d3.json(rootJsonFileName, function(json) {
 //d3.json(appJsonFile, function(error, json) {
   console.log(json);
@@ -255,9 +278,14 @@ d3.json(rootJsonFileName, function(json) {
   //toggle(root.children[1].children[2]);
   //toggle(root.children[9]);
   //toggle(root.children[9].children[0]);
-  update(root);
-  document.getElementById('loading_message').innerHTML = "";
-});
+  update(tree, root, vis, diagonal, direction, w);
+  // console.log("loading: " + document.getElementsByClassName('loading_message')[0].innerHTML);
+  document.getElementById(msg_id).innerHTML = "";
+});  
+}
+
+addTree("forward", "#body", "loading_message_1", [20, 120, 20, 120]);
+
 function get_base_url(){
 	var base_url = "";
 	if (getParameterByName("metric") == "competition"){
@@ -380,12 +408,20 @@ function change_root(d, i){
         })
 	*/
 }
-function update(source) {
+function update(tree, source, vis, diagonal, direction, w) {
   var duration = d3.event && d3.event.altKey ? 5000 : 500;
+  var i = 0;
   // Compute the new tree layout.
-  var nodes = tree.nodes(root).reverse();
+  var nodes = tree.nodes(source).reverse();
   // Normalize for fixed-depth.
-  nodes.forEach(function(d) { d.y = d.depth * 400; });
+  if (direction == "backward") {
+    // doing d.y = w - (d.depth * 400); }); flips the tree horizontally
+    nodes.forEach(function(d) { d.y = w - (d.depth * 400); });
+  } else {
+    nodes.forEach(function(d) { d.y = (d.depth * 400); });
+  }
+  
+
   // Update the nodesâ¦
   var node = vis.selectAll("g.node")
       .data(nodes, function(d) { return d.id || (d.id = ++i); });
@@ -478,11 +514,8 @@ function update(source) {
   nodes.forEach(function(d) {
     d.x0 = d.x;
     d.y0 = d.y;
-  });       
-
-
-
-};
+  });
+}
 // Toggle children.
 function toggle(d) {
   if (d.children) {
@@ -496,10 +529,67 @@ function toggle(d) {
   }
 }
 
+$(function() {
+
+
+var people = [];
+// console.log("json path:" + get_json_path() + year + "/" + getParameterByName("company"));
+$.getJSON(get_json_path() + year + "/" + getParameterByName("company") + ".json", function(data) {   
+  //  console.log("length: " + data.children.length);
+   var children_text = "";
+   tbody = $('<tbody>');
+   $(tbody).appendTo("#userdata");
+       for (var i = 0; i < data.children.length; i++) {
+         tr = $('<tr/>');
+         tr.append("<td>" + data.name + "</td>");
+         tr.append("<td>" + data.year + "</td>");
+                    
+         // children_text = children_text + data.children[i].name + ", ";
+         tr.append("<td>" + data.children[i].name + "</td>");
+         tr.append("<td>" + data.children[i].relationship + "</td>")
+         // tr.append("<td>" + data.children[i].item + "</td>");
+         children_text = children_text.substring(0, children_text.length-2); 
+         
+         $('table').append(tr);
+         $(tr).appendTo("#userdata");
+         
+       }
+    tbody = $('</tbody>');
+    $(tbody).appendTo("#userdata");
+       // var tblRow = "<tr>" + "<td>" + f.name + "</td>" +
+       //  "<td>" + f.year + "</td>" + "<td>" + f.children + "</td>" + "</tr>"
+       //  $(tblRow).appendTo("#userdata tbody");
+  });
+
+});
+
+;
 
 
     </script>
-
+    <div class="scrolltable">
+        <table id= "userdata" class="tableSection" border="2">
+          <thead>
+                    <th>Name</th>
+                    <th>Year</th>
+                    <th>Children</th>
+                    <th>Relationship</th>
+                    <th>Item</th>
+                    <th>Context</th>
+                    <th>Confidence Score</th>
+                    <th>Strength</th>
+                </thead>
+        </table>
+      </div>
+      <div id="bottomTree">
+        <h2 align="center" id="loading_message_2">Data is loading... </h2>
+        <div id="footer">
+        </div>
+      </div>
+      <script type="text/javascript">
+        addTree("backward", "#bottomTree", "loading_message_2",
+          [20, 700, 20, 120]);
+      </script>
   </body>
 
 </html>
