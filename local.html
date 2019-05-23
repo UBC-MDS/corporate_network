@@ -34,8 +34,51 @@ path.link {
 
 body {
   overflow-y: scroll;
-  overflow-x: hidden;
+  overflow-x: scroll;
 }
+
+/*
+table.tableSection {
+  display: table;
+  width: 100%;
+}
+
+table.tableSection thead,
+table.tableSection tbody {
+  width: 100%;
+}
+
+table.tableSection thead {
+  overflow-y: scroll;
+  display: table;
+  table-layout: fixed;
+  width: calc(100% - 16px); // assuming scrollbar width as 16px 
+}
+
+table.tableSection tbody {
+  overflow: auto;
+  height: 150px;
+  display: block;
+}
+
+table.tableSection tr {
+  width: 100%;
+  text-align: left;
+  display: table;
+  table-layout: fixed;
+}
+*/
+
+thead th { 
+  position: sticky; top: 0;
+  background-color: white; 
+}
+
+.scrolltable {
+    overflow-y:scroll;
+    height: 200px;
+} 
+
 </style>
   </head>
   <body>
@@ -61,23 +104,24 @@ body {
     </div> 
 
     <div class="dropdown">
-            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Filing Year
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" onclick="myAjax(populateYearMenu)">Filing Year
             <span class="caret"></span></button>
-            <ul class="dropdown-menu">
-                <li><a id="2013" href="">2013</a></li>
-                <li><a id="2014" href="">2014</a></li>
+            <ul class="dropdown-menu" id="year-menu">
+                <!-- <li><a id="2013" href="">2013</a></li>
+                <li><a id="2014" href="">2014</a></li> -->
             </ul>
         </div> 
 
     <BR>
 	<font id="hint" size="3" color="grey"><I>click circle to change the root</I></font>
         <!--div class="hint">click or option-click to expand or collapse</div-->
+
     </body>
     
     <body>
     <div id="body">
         <!-- might need to change this loading message-->
-      <h2 align="center" id="loading_message">Data is loading... </h2>
+      <h2 align="center" id="loading_message_1">Data is loading... </h2>
       <div id="footer">
         <!--p id="footer_text2">d3.layout.tree</p>
         <div class="hint">click or option-click to expand or collapse</div-->
@@ -176,8 +220,8 @@ document.getElementById('full').setAttribute('href', "./local_full.html?metric=f
 
 
 // added year
-document.getElementById('2013').setAttribute('href', "./local.html?metric=competition&year=2013&company=" + getParameterByName("company"))
-document.getElementById('2014').setAttribute('href', "./local.html?metric=competition&year=2014&company=" + getParameterByName("company"))
+// document.getElementById('2013').setAttribute('href', "./local.html?metric=competition&year=2013&company=" + getParameterByName("company"))
+// document.getElementById('2014').setAttribute('href', "./local.html?metric=competition&year=2014&company=" + getParameterByName("company"))
 if ( check_json_exists_target() ) {
 	var jsonData = $.ajax({
 		url: getJsonFileName(getParameterByName("company")),
@@ -203,11 +247,12 @@ else {
         document.getElementById('footer_metric').innerHTML = metric.charAt(0).toUpperCase() + metric.slice(1);
         document.getElementById('footer_year').innerHTML = year;
 	document.getElementById('hint').innerHTML = "";
-	document.getElementById('loading_message').innerHTML = "Data is not available for this company in this proximity measure.";
+	document.getElementsByClassName('loading_message').innerHTML = "Data is not available for this company in this proximity measure.";
 }
+
 // Tree 
-var m = [20, 120, 20, 120],
-    w = 1280 - m[1] - m[3],
+function addTree(direction, id, msg_id, m) {
+  var w = 1280 - m[1] - m[3],
     h = 700 - m[0] - m[2],
     i = 0,
     root;
@@ -215,12 +260,21 @@ var tree = d3.layout.tree()
     .size([h, w]);
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
-var vis = d3.select("#body").append("svg:svg")
+var vis = d3.select(id).append("svg:svg")
     .attr("width", w + m[1] + m[3])
     .attr("height", h + m[0] + m[2])
+    // .on("wheel.zoom", true)
+    // .attr("viewBox", "0,0,400,400")
   .append("svg:g")
     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
-rootJsonFileName = getJsonFileName(getParameterByName("company"));
+if (direction == "forward") {
+  rootJsonFileName = getJsonFileName(getParameterByName("company"));
+} else {
+  // grab the JSON file associated with the backward tree
+  rootJsonFileName = getJsonFileName(getParameterByName("company"));
+  
+}
+
 d3.json(rootJsonFileName, function(json) {
 //d3.json(appJsonFile, function(error, json) {
   console.log(json);
@@ -254,9 +308,13 @@ d3.json(rootJsonFileName, function(json) {
   //toggle(root.children[1].children[2]);
   //toggle(root.children[9]);
   //toggle(root.children[9].children[0]);
-  update(root);
-  document.getElementById('loading_message').innerHTML = "";
-});
+  update(tree, root, vis, diagonal, direction, w);
+  // console.log("loading: " + document.getElementsByClassName('loading_message')[0].innerHTML);
+  document.getElementById(msg_id).innerHTML = "";
+});  
+}
+addTree("forward", "#body", "loading_message_1", [20, 120, 20, 120]);
+
 function get_base_url(){
 	var base_url = "";
 	if (getParameterByName("metric") == "competition"){
@@ -311,7 +369,7 @@ function fileExists(url)
 {
     var http = new XMLHttpRequest();
     http.open('HEAD', url, false);
-    http.send();
+    http.send();    
     return http.status!=404;
 }
 function check_json_exists_target(){
@@ -379,12 +437,20 @@ function change_root(d, i){
         })
 	*/
 }
-function update(source) {
+function update(tree, source, vis, diagonal, direction, w) {
   var duration = d3.event && d3.event.altKey ? 5000 : 500;
+  var i = 0;
   // Compute the new tree layout.
-  var nodes = tree.nodes(root).reverse();
+  var nodes = tree.nodes(source).reverse();
   // Normalize for fixed-depth.
-  nodes.forEach(function(d) { d.y = d.depth * 400; });
+  if (direction == "backward") {
+    // doing d.y = w - (d.depth * 400); }); flips the tree horizontally
+    nodes.forEach(function(d) { d.y = w - (d.depth * 400); });
+  } else {
+    nodes.forEach(function(d) { d.y = (d.depth * 400); });
+  }
+  
+
   // Update the nodesâ¦
   var node = vis.selectAll("g.node")
       .data(nodes, function(d) { return d.id || (d.id = ++i); });
@@ -492,14 +558,61 @@ function toggle(d) {
   }
 }
 
+// Returns an array of the valid years for the company
+function myAjax (callback) {
+  var comp_name = getParameterByName("company");
+  var results;
+
+  $.ajax( { type : 'POST',
+    data : {'company': comp_name},
+    url  : 'get_years.php',              // <=== CALL THE PHP FUNCTION HERE.
+    success: function ( data ) {
+      // alert( data );               // <=== VALUE RETURNED FROM FUNCTION.
+      results = jQuery.parseJSON(data);       
+      callback(results);
+    },
+    error: function ( xhr ) {
+      alert( "error" );
+    }
+  });
+}
+
+function populateYearMenu(years) {
+
+  // https://stackoverflow.com/questions/27769763/populating-a-html-dropdown-menu-through-a-javascript-function
+  // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
+  var dropdown = document.getElementById("year-menu");
+  // console.log("dropdown" + dropdown);
+  var i, newOption, newLink, newLink;
+
+  // first need to clear out the dropdown or else subsequent clicks
+  // will cause the list to be too long
+  while (dropdown.firstChild) {
+    dropdown.removeChild(dropdown.firstChild);
+  }
+  
+  for (i = 0; i < years.length; i++) {
+      newOption = document.createElement("li");
+      // newOption.textContent = years[i];
+      newLink = document.createElement("a");
+      newLink.textContent = years[i];
+      newLink.href = "./local_full.html?metric=full&year=" + years[i] + "&company=" + getParameterByName("company");
+      newOption.appendChild(newLink);
+      dropdown.appendChild(newOption);
+  }
+}
+
+
 $(function() {
 
 
 var people = [];
-
-$.getJSON(get_json_path() + year + "/" + companyName.toLowerCase() + ".json", function(data) {
-   // console.log(data.children);
+// console.log("json path:" + get_json_path() + year + "/" + getParameterByName("company"));
+$.getJSON(get_json_path() + year + "/" + getParameterByName("company") + ".json", function(data) {   
+  //  console.log("length: " + data.children.length);
    var children_text = "";
+   tbody = $('<tbody>');
+   $(tbody).appendTo("#userdata");
        for (var i = 0; i < data.children.length; i++) {
          tr = $('<tr/>');
          tr.append("<td>" + data.name + "</td>");
@@ -507,13 +620,15 @@ $.getJSON(get_json_path() + year + "/" + companyName.toLowerCase() + ".json", fu
                     
          // children_text = children_text + data.children[i].name + ", ";
          tr.append("<td>" + data.children[i].name + "</td>");
-         
+         // tr.append("<td>" + data.children[i].item + "</td>");
          children_text = children_text.substring(0, children_text.length-2); 
          
          $('table').append(tr);
          $(tr).appendTo("#userdata");
          
        }
+    tbody = $('</tbody>');
+    $(tbody).appendTo("#userdata");
        // var tblRow = "<tr>" + "<td>" + f.name + "</td>" +
        //  "<td>" + f.year + "</td>" + "<td>" + f.children + "</td>" + "</tr>"
        //  $(tblRow).appendTo("#userdata tbody");
@@ -522,15 +637,28 @@ $.getJSON(get_json_path() + year + "/" + companyName.toLowerCase() + ".json", fu
 });
 
 ;
+
     </script>
 
-    <table id= "userdata" border="2">
-      <thead>
-                <th>name</th>
-                <th>year</th>
-                <th>children</th>
-            </thead>
-    </table>
+    <div class="scrolltable">
+      <table id= "userdata" class="tableSection" border="2">
+        <thead>
+                  <th>name</th>
+                  <th>year</th>
+                  <th>children</th>
+                  <th>item</th>
+              </thead>
+      </table>
+    </div>
+    <div id="bottomTree">
+      <h2 align="center" id="loading_message_2">Data is loading... </h2>
+      <div id="footer">
+      </div>
+    </div>
+    <script type="text/javascript">
+      addTree("backward", "#bottomTree", "loading_message_2",
+        [20, 700, 20, 120]);
+    </script>
   </body>
-
+  
 </html>
