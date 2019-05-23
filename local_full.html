@@ -71,11 +71,11 @@ thead th {
         </ul>
     </div> 
     <div class="dropdown">
-            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Filing Year
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" onclick="myAjax(populateYearMenu)">Filing Year
             <span class="caret"></span></button>
-            <ul class="dropdown-menu">
-                <li><a id="2013" href="">2013</a></li>
-                <li><a id="2014" href="">2014</a></li>
+            <ul class="dropdown-menu" id="year-menu">
+                <!-- <li><a id="2013" href="">2013</a></li>
+                <li><a id="2014" href="">2014</a></li> -->
             </ul>
         </div> 
       <div id="legend2">
@@ -190,8 +190,8 @@ document.getElementById('full').setAttribute('href', "./local_full.html?metric=f
 
 
 // added year
-document.getElementById('2013').setAttribute('href', "./local_full.html?metric=full&year=2013&company=" + getParameterByName("company"))
-document.getElementById('2014').setAttribute('href', "./local_full.html?metric=full&year=2014&company=" + getParameterByName("company"))
+//document.getElementById('2013').setAttribute('href', "./local_full.html?metric=full&year=2013&company=" + getParameterByName("company"))
+//document.getElementById('2014').setAttribute('href', "./local_full.html?metric=full&year=2014&company=" + getParameterByName("company"))
 if ( check_json_exists_target() ) {
 	var jsonData = $.ajax({
 		url: getJsonFileName(getParameterByName("company")),
@@ -217,7 +217,7 @@ else {
         document.getElementById('footer_metric').innerHTML = metric.charAt(0).toUpperCase() + metric.slice(1);
         document.getElementById('footer_year').innerHTML = year;
 	document.getElementById('hint').innerHTML = "";
-	document.getElementById('loading_message').innerHTML = "Data is not available for this company in this proximity measure.";
+	document.getElementById('loading_message_1').innerHTML = "Data is not available for this company in this proximity measure.";
 }
 
 // Tree 
@@ -529,7 +529,54 @@ function toggle(d) {
   }
 }
 
+// Returns an array of the valid years for the company
+function myAjax (callback) {
+  var comp_name = getParameterByName("company");
+  var results;
+
+  $.ajax( { type : 'POST',
+    data : {'company': comp_name},
+    url  : 'get_years.php',              // <=== CALL THE PHP FUNCTION HERE.
+    success: function ( data ) {
+      // alert( data );               // <=== VALUE RETURNED FROM FUNCTION.
+      results = jQuery.parseJSON(data);       
+      callback(results);
+    },
+    error: function ( xhr ) {
+      alert( "error" );
+    }
+  });
+}
+
+function populateYearMenu(years) {
+
+  // https://stackoverflow.com/questions/27769763/populating-a-html-dropdown-menu-through-a-javascript-function
+  // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
+  var dropdown = document.getElementById("year-menu");
+  // console.log("dropdown" + dropdown);
+  var i, newOption, newLink, newLink;
+
+  // first need to clear out the dropdown or else subsequent clicks
+  // will cause the list to be too long
+  while (dropdown.firstChild) {
+    dropdown.removeChild(dropdown.firstChild);
+  }
+  
+  for (i = 0; i < years.length; i++) {
+      newOption = document.createElement("li");
+      // newOption.textContent = years[i];
+      newLink = document.createElement("a");
+      newLink.textContent = years[i];
+      newLink.href = "./local_full.html?metric=full&year=" + years[i] + "&company=" + getParameterByName("company");
+      newOption.appendChild(newLink);
+      dropdown.appendChild(newOption);
+  }
+}
+
+
+
 $(function() {
+
 
 
 var people = [];
@@ -566,6 +613,7 @@ $.getJSON(get_json_path() + year + "/" + getParameterByName("company") + ".json"
 ;
 
 
+
     </script>
     <div class="scrolltable">
         <table id= "userdata" class="tableSection" border="2">
@@ -590,6 +638,10 @@ $.getJSON(get_json_path() + year + "/" + getParameterByName("company") + ".json"
         addTree("backward", "#bottomTree", "loading_message_2",
           [20, 700, 20, 120]);
       </script>
+      
+      <?php
+        echo "Hi, I'm here!"
+      ?>
   </body>
 
 </html>
