@@ -1,19 +1,4 @@
 <?php
-// insert();
-
-// function select() {
-//     echo "The select function is called.";
-//     exit;
-// }
-
-// function insert() {
-//     echo "The insert function is called.";
-//     exit;
-// }
-
-// $dirs = array_filter(glob('*'), 'is_dir');
-// print_r($dirs);
-
 function getDirContents($dir, &$results = array()){
     $files = scandir($dir);
 
@@ -47,13 +32,10 @@ function getValidYears($dirs, $company, &$results = array()) {
     foreach($dirs as $value) {
         $arr_filepath = explode("/", $value);
         $year = array_values(array_slice($arr_filepath, -1))[0];
-        // var_dump($value);
-        // var_dump($year);
         $test_path = $value . '/' . $company . '.json';
         $test_cited_path = $value . '/cited/' . $company . '.json';
-        $test_cited_path = $value . '/filed/' . $company . '.json';
-        // var_dump($test_path);
-        if (file_exists($test_path)) {            
+        $test_filed_path = $value . '/filed/' . $company . '.json';    
+        if (file_exists($test_cited_path) || file_exists($test_filed_path) || file_exists($test_path)) {            
             $results[] = $year;
         }
     }
@@ -65,10 +47,12 @@ if (isset($_POST['company'])) {
     $comp_name = $_POST['company'];
 }
 
-$files = getDirContents('/var/www/html/corporate_network/json.full/converted');
-$dirs = getAllDirs('/var/www/html/corporate_network/json.full/converted');
-// var_dump($years);
+if (isset($_POST['metric'])) {
+    $metric = $_POST['metric'];
+}
+
+$directory = './json.' . $metric . '/converted';
+$dirs = getAllDirs($directory);
 $years = getValidYears($dirs, $comp_name);
-// var_dump($files);
 echo json_encode($years);
 ?>
