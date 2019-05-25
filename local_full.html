@@ -124,9 +124,11 @@ function getParameterByName(name)
   else
     return decodeURIComponent(results[1].replace(/\+/g, " "));
 }
-function getJsonFileName(companyId){
+function getJsonFileName(companyId, direction){
 	var json_path = "";
 	var base_url = "";
+  var companyJsonFile;
+
 	// Gene: get json data
 	if (getParameterByName("metric") == "competition"){
 		json_path = "./json.competition/converted/";
@@ -156,10 +158,14 @@ function getJsonFileName(companyId){
 		json_path = "./json/converted/";
 		base_url = "./local.html?company=";
 	}
-  var companyJsonFile = json_path +year+"/" + companyId + ".json";
-	console.log(companyJsonFile);
+  if (direction == "backward") {
+    companyJsonFile = json_path + year + "/cited/" + companyId + ".json";
+  } else {
+    companyJsonFile = json_path + year + "/filed/" + companyId + ".json";
+  }
 	return companyJsonFile;
 }
+
 var metric = "";
 if (getParameterByName("metric") == "competition"){
 	metric = "competition";
@@ -194,7 +200,7 @@ document.getElementById('full').setAttribute('href', "./local_full.html?metric=f
 //document.getElementById('2014').setAttribute('href', "./local_full.html?metric=full&year=2014&company=" + getParameterByName("company"))
 if ( check_json_exists_target() ) {
 	var jsonData = $.ajax({
-		url: getJsonFileName(getParameterByName("company")),
+		url: getJsonFileName(getParameterByName("company"), "forward"),
 		data: "",
 		dataType: "json",
 		async: false
@@ -240,13 +246,7 @@ var vis = d3.select(id).append("svg:svg")
     // .attr("viewBox", "0,0,400,400")
   .append("svg:g")
     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
-if (direction == "forward") {
-  rootJsonFileName = getJsonFileName(getParameterByName("company"));
-} else {
-  // grab the JSON file associated with the backward tree
-  rootJsonFileName = getJsonFileName(getParameterByName("company"));
-  
-}
+rootJsonFileName = getJsonFileName(getParameterByName("company"), direction);
 
 d3.json(rootJsonFileName, function(json) {
 //d3.json(appJsonFile, function(error, json) {
