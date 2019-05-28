@@ -44,7 +44,7 @@ div.tooltip {
     position: absolute;
     text-align: left;
     width: 300px;
-    height: 80px;
+    height: 225px;
     padding: 5px;
     font: 12px sans-serif;
     background: lightsteelblue;
@@ -368,6 +368,7 @@ function update(tree, source, vis, diagonal, direction, w) {
   var node = vis.selectAll("g.node")
       .data(nodes, function(d) { return d.id || (d.id = ++i); })
       ;
+
   // Enter any new nodes at the parent's previous position.
   var nodeEnter = node.enter().append("svg:g")
       .attr("class", "node")
@@ -379,9 +380,10 @@ function update(tree, source, vis, diagonal, direction, w) {
           .style("opacity", .9);
         div.html(
             // "Relationship: " + d.relationship.charAt(0).toUpperCase() + d.relationship.slice(1)+ "<br/>" +
-            d.name + " was cited <B>" + d.reference_strength + " time(s) </B> in this filing <BR/>"
-            + "and cited <B>" + d.relationship_strength + " time(s)</B> in a <B>" + d.relationship +"</B> context." +
-            "<BR><BR> This citation was found in the <B>" + d.header +" </B> header of the 10-K filing"
+            "<B>"+d.name + "</B> was cited by <B>" + d.cited_by + " <BR>"+ d.reference_strength 
+            + " time(s) </B> in this filing and cited <B>" + d.relationship_strength + " time(s)</B> in a <B>" + d.relationship +"</B> context." +
+            "<BR><BR> This citation was found in the <B>" + d.header +" </B> header of the 10-K filing. <BR><BR>" +
+            "Sentence in reference: <BR> <B>" + d.sentence
             )
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY - 28) + "px");
@@ -408,7 +410,7 @@ function update(tree, source, vis, diagonal, direction, w) {
         })
       ;
   nodeEnter.append("svg:text")
-      .attr("x", function(d) { 
+  .attr("x", function(d) { 
         if (direction == "forward") {
           if ((d.children || d._children) == false) {
             return 10;
@@ -416,7 +418,12 @@ function update(tree, source, vis, diagonal, direction, w) {
             if (typeof d.children == 'undefined') {
               return 10;
             } else {
-              return -10;
+              if (d != source) {
+                return 0;
+              } else {
+                return -10;
+              }
+              
             }            
           }           
         } else {
@@ -426,6 +433,22 @@ function update(tree, source, vis, diagonal, direction, w) {
             return -10;
           }          
         }
+      })
+      .attr("y", function(d) { 
+        if (direction == "forward") {
+          if ((d.children || d._children) == false) {
+            return 0;
+          } else {
+            if (typeof d.children == 'undefined') {
+              return 0;
+            } else {
+              if (d != source) {
+                return -10;
+              }
+              return 0;
+            }            
+          }           
+        } 
       })    
       .attr("dy", ".35em")
       .attr("text-anchor", function(d) { 
@@ -565,6 +588,10 @@ function populateTable(id, direction) {
   $.getJSON(getJsonFileName(getParameterByName("company"), direction), function(data) {   
     //  console.log("length: " + data.children.length);
     var children_text = "";
+    var accession = "";
+    var clean_accession = "";
+    var cik = "";
+    var name = "";
     tbody = $('<tbody>');
     $(tbody).appendTo(id);
         for (var i = 0; i < data.children.length; i++) {
@@ -581,9 +608,26 @@ function populateTable(id, direction) {
           tr.append("<td>" + data.children[i].reference_strength + "</td>");
           tr.append("<td>" + data.children[i].paragraph + "</td>");
           // tr.append("<td>" + data.children[i].item + "</td>");
+          if (direction == "forward") {
+            accession = data.accession;
+            name = data.name;
+            // clean_accession = data.children[i].accession;  // need to remove
+          } else {            
+            accession = data.children[i].accession;
+            name = data.children[i].name;
+            // cik = data.children[i].cik; // apparently don't need cik for the EDGAR link
+          }
+          console.log("accession: " + accession);
+          try {
+            clean_accession = accession.replace(/-/g, "");
+            tr.append("<td><a href='https://www.sec.gov/Archives/edgar/data/" + clean_accession + "/" + accession + "-index.htm'>" + name + "</a></td>");
+          } catch (e) {
+            tr.append("<td> No Link Available </td>");
+          }
+
           children_text = children_text.substring(0, children_text.length-2); 
           
-          $('table').append(tr);
+          // $('table').append(tr);
           $(tr).appendTo(id);
           
         }
@@ -632,6 +676,7 @@ populateTable("#cited-data", "backward");
                     <th>Confidence Score</th>
                     <th>Citation Count</th>
                     <th>Sentence</th>
+                    <th>Link to SEC Filing</th>
                 </thead></tr>
         </table>
       </div></body>
@@ -677,6 +722,7 @@ populateTable("#cited-data", "backward");
               <th>Confidence Score</th>
               <th>Citation Count</th>
               <th>Sentence</th>
+              <th>Link to SEC Filing</th>
               </thead>
           </table>
         </div>
