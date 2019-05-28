@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 // insert();
 
 // function select() {
@@ -14,6 +15,8 @@
 // $dirs = array_filter(glob('*'), 'is_dir');
 // print_r($dirs);
 
+=======
+>>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
 function getDirContents($dir, &$results = array()){
     $files = scandir($dir);
 
@@ -47,12 +50,18 @@ function getValidYears($dirs, $company, &$results = array()) {
     foreach($dirs as $value) {
         $arr_filepath = explode("/", $value);
         $year = array_values(array_slice($arr_filepath, -1))[0];
+<<<<<<< HEAD
         // var_dump($value);
         // var_dump($year);
         $test_path = $value . '/' . $company . '.json';
         $test_cited_path = $value . '/cited/' . $company . '.json';
         $test_filed_path = $value . '/filed/' . $company . '.json';
         // var_dump($test_path);
+=======
+        $test_path = $value . '/' . $company . '.json';
+        $test_cited_path = $value . '/cited/' . $company . '.json';
+        $test_filed_path = $value . '/filed/' . $company . '.json';    
+>>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
         if (file_exists($test_cited_path) || file_exists($test_filed_path) || file_exists($test_path)) {            
             $results[] = $year;
         }
@@ -70,11 +79,16 @@ if (isset($_POST['metric'])) {
 }
 
 $directory = './json.' . $metric . '/converted';
+<<<<<<< HEAD
 // var_dump($directory);
 // $files = getDirContents('/var/www/html/corporate_network/json.full/converted');
 $dirs = getAllDirs($directory);
 // var_dump($dirs);
 $years = getValidYears($dirs, $comp_name);
 // var_dump($years);
+=======
+$dirs = getAllDirs($directory);
+$years = getValidYears($dirs, $comp_name);
+>>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
 echo json_encode($years);
 ?>
