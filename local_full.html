@@ -578,7 +578,7 @@ function populateTable(id, direction) {
           tr.append("<td>" + data.children[i].item + "</td>");
           tr.append("<td>" + data.children[i].header + "</td>");
           tr.append("<td>" + data.children[i].confidence_score + "</td>");
-          tr.append("<td>" + data.children[i].relationship_strength + "</td>");
+          tr.append("<td>" + data.children[i].reference_strength + "</td>");
           tr.append("<td>" + data.children[i].paragraph + "</td>");
           // tr.append("<td>" + data.children[i].item + "</td>");
           children_text = children_text.substring(0, children_text.length-2); 
@@ -623,14 +623,14 @@ populateTable("#cited-data", "backward");
         <table id= "userdata" class="tableSection" >
           <tr> 
           <thead>
-                    <th>Name</th>
-                    <th>Year</th>
-                    <th>Children</th>
+                    <th>Filing Company</th>
+                    <th>Fiscal Year</th>
+                    <th>Cited Company</th>
                     <th>Relationship  </th>
                     <th>Item</th>
                     <th>Context</th>
                     <th>Confidence Score</th>
-                    <th>Strength</th>
+                    <th>Citation Count</th>
                     <th>Sentence</th>
                 </thead></tr>
         </table>
@@ -642,6 +642,13 @@ populateTable("#cited-data", "backward");
         </a> <BR>
             <font size="4">Relationship Type: <b class="footer_metric"></b></font>
     </font><BR>
+      <div id="legend2">
+        <div class="legend2"> <p class="country-name"><span class="key-dot agreement"></span><font id="hint" size="2">Agreements</font></p> </div>
+        <div class="legend2"> <p class="country-name"><span class="key-dot competition"></span><font id="hint" size="2">Competition</font></p> </div>
+        <div class="legend2"> <p class="country-name"><span class="key-dot legal"></span><font id="hint" size="2">Legal Suit</font></p> </div>
+        <div class="legend2"> <p class="country-name"><span class="key-dot ownership"></span><font id="hint" size="2">Ownership</font></p> </div>
+        <div class="legend2"> <p class="country-name"><span class="key-dot personal"></span><font id="hint" size="2">Personal Ties</font></p> </div>
+      </div><BR>
       <div id="bottomTree">
         <h2 align="center" id="loading_message_2">Data is loading... </h2>
         <div id="footer">
@@ -662,13 +669,13 @@ populateTable("#cited-data", "backward");
           <table id= "cited-data" class="tableSection">
             <thead>
               <th>Cited Company</th>
-              <th>Year</th>
+              <th>Fiscal Year</th>
               <th>Filing Company</th>
               <th>Relationship</th>
               <th>Item</th>
               <th>Context</th>
               <th>Confidence Score</th>
-              <th>Strength</th>
+              <th>Citation Count</th>
               <th>Sentence</th>
               </thead>
           </table>
