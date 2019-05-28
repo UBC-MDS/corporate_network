@@ -11,7 +11,6 @@
     <link rel="stylesheet"  href="css/legends.css">
     <style type="text/css">
     
-
 .node circle {
   cursor: pointer;
   fill: lightblue;
@@ -31,19 +30,15 @@ body {
   overflow-y: scroll;
   overflow-x: scroll;
 }
-
 thead th { 
   position: sticky; top: 0;
   background-color: white; 
 }
-<<<<<<< HEAD
-
 .scrolltable {
     overflow-y:scroll;
     height: 300px;
     width: 1200px;
 } 
-
 /* Tooltip container */
 div.tooltip {
     position: absolute;
@@ -57,14 +52,6 @@ div.tooltip {
     border-radius: 4px;
     pointer-events: none;
   }
-=======
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
-
-.scrolltable {
-    overflow-y:scroll;
-    height: 200px;
-} 
-
 </style>
   </head>
   <body>
@@ -92,11 +79,6 @@ div.tooltip {
             <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" onclick="myAjax(populateYearMenu)">Filing Year
             <span class="caret"></span></button>
             <ul class="dropdown-menu" id="year-menu">
-<<<<<<< HEAD
-=======
-                <!-- <li><a id="2013" href="">2013</a></li>
-                <li><a id="2014" href="">2014</a></li> -->
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
             </ul>
         </div> 
       <div id="legend2">
@@ -146,10 +128,6 @@ function getJsonFileName(companyId, direction){
 	var json_path = "";
 	var base_url = "";
   var companyJsonFile;
-<<<<<<< HEAD
-=======
-
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
 	// Gene: get json data
 	if (getParameterByName("metric") == "competition"){
 		json_path = "./json.competition/converted/";
@@ -186,7 +164,6 @@ function getJsonFileName(companyId, direction){
   }
 	return companyJsonFile;
 }
-
 var metric = "";
 if (getParameterByName("metric") == "competition"){
 	metric = "competition";
@@ -206,9 +183,7 @@ else if (getParameterByName("metric") == "personal"){
   else if (getParameterByName("metric") == "full"){
 	metric = "all relationships";
 }
-
 var year = getParameterByName("year");
-
 // proximity
 document.getElementById('competition').setAttribute('href', "./local.html?metric=competition&year="+ getParameterByName("year") +"&company=" + getParameterByName("company"));
 document.getElementById('ownership').setAttribute('href', "./local.html?metric=ownership&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
@@ -216,14 +191,6 @@ document.getElementById('agreement').setAttribute('href', "./local.html?metric=a
 document.getElementById('legal').setAttribute('href', "./local.html?metric=legal&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
 document.getElementById('personal').setAttribute('href', "./local.html?metric=personal&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
 document.getElementById('full').setAttribute('href', "./local_full.html?metric=full&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
-
-<<<<<<< HEAD
-=======
-
-// added year
-//document.getElementById('2013').setAttribute('href', "./local_full.html?metric=full&year=2013&company=" + getParameterByName("company"))
-//document.getElementById('2014').setAttribute('href', "./local_full.html?metric=full&year=2014&company=" + getParameterByName("company"))
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
 if ( check_json_exists_target() ) {
 	var jsonData = $.ajax({
 		url: getJsonFileName(getParameterByName("company"), "forward"),
@@ -241,7 +208,6 @@ else {
 	document.getElementById('hint').innerHTML = "";
 	document.getElementById('loading_message_1').innerHTML = "Data is not available for this company in this proximity measure.";
 }
-
 // Tree 
 function addTree(direction, id, msg_id, m) {
   var w = 1280 - m[1] - m[3],
@@ -262,12 +228,7 @@ var vis = d3.select(id).append("svg:svg")
     // .attr("viewBox", "0,0,400,400")
   .append("svg:g")
     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
-<<<<<<< HEAD
   rootJsonFileName = getJsonFileName(getParameterByName("company"), direction);
-=======
-rootJsonFileName = getJsonFileName(getParameterByName("company"), direction);
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
-
 d3.json(rootJsonFileName, function(json) {
 //d3.json(appJsonFile, function(error, json) {
   console.log(json);
@@ -292,30 +253,19 @@ d3.json(rootJsonFileName, function(json) {
       toggle(d);
     }
   }
-
   if (direction == "forward") {
     // Initialize the display to show a few nodes.
     root.children.forEach(toggleAll);    
   }
-
   for(var i in root.children){
       toggle(root.children[i]);
   }
-<<<<<<< HEAD
-
-=======
-  //toggle(root.children[1].children[2]);
-  //toggle(root.children[9]);
-  //toggle(root.children[9].children[0]);
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
   update(tree, root, vis, diagonal, direction, w);
   // console.log("loading: " + document.getElementsByClassName('loading_message')[0].innerHTML);
   document.getElementById(msg_id).innerHTML = "";
 });  
 }
-
 addTree("forward", "#body", "loading_message_1", [20, 120, 20, 120]);
-
 function get_base_url(){
 	var base_url = "";
 	if (getParameterByName("metric") == "competition"){
@@ -400,13 +350,7 @@ function change_root(d, i){
 	else{
 		console.log("no data for " + d.name);
 	}
-
 }
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
 function update(tree, source, vis, diagonal, direction, w) {
   var duration = d3.event && d3.event.altKey ? 5000 : 500;
   var i = 0;
@@ -420,13 +364,7 @@ function update(tree, source, vis, diagonal, direction, w) {
     nodes.forEach(function(d) { d.y = (d.depth * 400); });
   }
   
-
-<<<<<<< HEAD
-
   // Update the nodes¦
-=======
-  // Update the nodesâ¦
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
   var node = vis.selectAll("g.node")
       .data(nodes, function(d) { return d.id || (d.id = ++i); })
       ;
@@ -444,9 +382,6 @@ function update(tree, source, vis, diagonal, direction, w) {
             d.name + " was cited <B>" + d.reference_strength + " time(s) </B> in this filing <BR/>"
             + "and cited <B>" + d.relationship_strength + " time(s)</B> in a <B>" + d.relationship +"</B> context." +
             "<BR><BR> This citation was found in the <B>" + d.header +" </B> header of the 10-K filing"
-
-
-
             )
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY - 28) + "px");
@@ -462,8 +397,6 @@ function update(tree, source, vis, diagonal, direction, w) {
   var div = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
-
-
   nodeEnter.append("svg:circle")
       .attr("r", 1e-6)
       .style("fill", function(d) {
@@ -474,7 +407,6 @@ function update(tree, source, vis, diagonal, direction, w) {
           if(d.relationship == "agreement") return "plum";
         })
       ;
-
   nodeEnter.append("svg:text")
       .attr("x", function(d) { 
         if (direction == "forward") {
@@ -520,8 +452,6 @@ function update(tree, source, vis, diagonal, direction, w) {
       .style("fill", function(d) {
           return check_json_exists(d) ? "steelblue" : "black";})
       .style("fill-opacity", 1e-6);
-
-
   // Transition nodes to their new position.
   var nodeUpdate = node.transition()
       .duration(duration)
@@ -539,8 +469,6 @@ function update(tree, source, vis, diagonal, direction, w) {
       ;
   nodeUpdate.select("text")
       .style("fill-opacity", 1);
-
-
   // Transition exiting nodes to the parent's new position.
   var nodeExit = node.exit().transition()
       .duration(duration)
@@ -593,58 +521,11 @@ function toggle(d) {
     //console.log("expand:" + d.name);
   }
 }
-
-// Returns an array of the valid years for the company
-function myAjax (callback) {
-  var comp_name = getParameterByName("company");
-  var results;
-
-  $.ajax( { type : 'POST',
-    data : {'company': comp_name},
-    url  : 'get_years.php',              // <=== CALL THE PHP FUNCTION HERE.
-    success: function ( data ) {
-      // alert( data );               // <=== VALUE RETURNED FROM FUNCTION.
-      results = jQuery.parseJSON(data);       
-      callback(results);
-    },
-    error: function ( xhr ) {
-      alert( "error" );
-    }
-  });
-}
-
-function populateYearMenu(years) {
-
-  // https://stackoverflow.com/questions/27769763/populating-a-html-dropdown-menu-through-a-javascript-function
-  // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
-  var dropdown = document.getElementById("year-menu");
-  // console.log("dropdown" + dropdown);
-  var i, newOption, newLink, newLink;
-
-  // first need to clear out the dropdown or else subsequent clicks
-  // will cause the list to be too long
-  while (dropdown.firstChild) {
-    dropdown.removeChild(dropdown.firstChild);
-  }
-  
-  for (i = 0; i < years.length; i++) {
-      newOption = document.createElement("li");
-      // newOption.textContent = years[i];
-      newLink = document.createElement("a");
-      newLink.textContent = years[i];
-      newLink.href = "./local_full.html?metric=full&year=" + years[i] + "&company=" + getParameterByName("company");
-      newOption.appendChild(newLink);
-      dropdown.appendChild(newOption);
-  }
-}
-
-
 // Returns an array of the valid years for the company
 function myAjax (callback) {
   var comp_name = getParameterByName("company");
   var metric = getParameterByName("metric");
   var results;
-
   $.ajax( { type : 'POST',
     data : {'company': comp_name, 'metric': metric},
     url  : 'get_years.php',              // <=== CALL THE PHP FUNCTION HERE.
@@ -658,13 +539,10 @@ function myAjax (callback) {
     }
   });
 }
-
 function populateYearMenu(years) {
-
   var dropdown = document.getElementById("year-menu");
   // console.log("dropdown" + dropdown);
   var i, newOption, newLink, newLink;
-
   // first need to clear out the dropdown or else subsequent clicks
   // will cause the list to be too long
   while (dropdown.firstChild) {
@@ -681,9 +559,6 @@ function populateYearMenu(years) {
       dropdown.appendChild(newOption);
   }
 }
-
-
-
 function populateTable(id, direction) {
   var people = [];
   // console.log("json path:" + get_json_path() + year + "/" + getParameterByName("company"));
@@ -719,11 +594,8 @@ function populateTable(id, direction) {
         //  $(tblRow).appendTo("#userdata tbody");
     });
 }
-
 populateTable("#userdata", "forward");
 populateTable("#cited-data", "backward");
-
-<<<<<<< HEAD
     </script>
     <head>
         <style>
@@ -770,62 +642,6 @@ populateTable("#cited-data", "backward");
         </a> <BR>
             <font size="4">Relationship Type: <b class="footer_metric"></b></font>
     </font><BR>
-=======
-$(function() {
-
-
-
-var people = [];
-// console.log("json path:" + get_json_path() + year + "/" + getParameterByName("company"));
-$.getJSON(get_json_path() + year + "/" + getParameterByName("company") + ".json", function(data) {   
-  //  console.log("length: " + data.children.length);
-   var children_text = "";
-   tbody = $('<tbody>');
-   $(tbody).appendTo("#userdata");
-       for (var i = 0; i < data.children.length; i++) {
-         tr = $('<tr/>');
-         tr.append("<td>" + data.name + "</td>");
-         tr.append("<td>" + data.year + "</td>");
-                    
-         // children_text = children_text + data.children[i].name + ", ";
-         tr.append("<td>" + data.children[i].name + "</td>");
-         tr.append("<td>" + data.children[i].relationship + "</td>")
-         // tr.append("<td>" + data.children[i].item + "</td>");
-         children_text = children_text.substring(0, children_text.length-2); 
-         
-         $('table').append(tr);
-         $(tr).appendTo("#userdata");
-         
-       }
-    tbody = $('</tbody>');
-    $(tbody).appendTo("#userdata");
-       // var tblRow = "<tr>" + "<td>" + f.name + "</td>" +
-       //  "<td>" + f.year + "</td>" + "<td>" + f.children + "</td>" + "</tr>"
-       //  $(tblRow).appendTo("#userdata tbody");
-  });
-
-});
-
-;
-
-
-
-    </script>
-    <div class="scrolltable">
-        <table id= "userdata" class="tableSection" border="2">
-          <thead>
-                    <th>Name</th>
-                    <th>Year</th>
-                    <th>Children</th>
-                    <th>Relationship</th>
-                    <th>Item</th>
-                    <th>Context</th>
-                    <th>Confidence Score</th>
-                    <th>Strength</th>
-                </thead>
-        </table>
-      </div>
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
       <div id="bottomTree">
         <h2 align="center" id="loading_message_2">Data is loading... </h2>
         <div id="footer">
@@ -834,7 +650,6 @@ $.getJSON(get_json_path() + year + "/" + getParameterByName("company") + ".json"
       <script type="text/javascript">
         addTree("backward", "#bottomTree", "loading_message_2",
           [20, 700, 20, 120]);
-<<<<<<< HEAD
         var i;
         // console.log("length of footer_metric array: " + document.getElementsByClassName("footer_metric").length);
         for (i = 0; i < document.getElementsByClassName('footer_metric').length; i++) {
@@ -858,13 +673,6 @@ $.getJSON(get_json_path() + year + "/" + getParameterByName("company") + ".json"
               </thead>
           </table>
         </div>
-=======
-      </script>
-      
-      <?php
-        echo "Hi, I'm here!"
-      ?>
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
   </body>
 <BR><BR><BR>
 </html>

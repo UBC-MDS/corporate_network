@@ -11,7 +11,6 @@
     <script src="https://raw.githubusercontent.com/susielu/d3-legend/master/d3-legend.min.js"></script>
     <style type="text/css">
     
-
 .node circle {
   cursor: pointer;
   fill: lightblue;
@@ -26,24 +25,19 @@ path.link {
   stroke: #ccc;
   stroke-width: 2px;
 }
-
 body {
   overflow-y: scroll;
   overflow-x: scroll;
 }
-
 thead th { 
   position: sticky; top: 0;
   background-color: white; 
 }
-
-<<<<<<< HEAD
 .scrolltable {
     overflow-y:scroll;
     height: 300px;
     width: 1200px;
 } 
-
 /* Tooltip container */
 div.tooltip {
     position: absolute;
@@ -57,55 +51,6 @@ div.tooltip {
     border-radius: 4px;
     pointer-events: none;
   }
-=======
-body {
-  overflow-y: scroll;
-  overflow-x: scroll;
-}
-
-/*
-table.tableSection {
-  display: table;
-  width: 100%;
-}
-
-table.tableSection thead,
-table.tableSection tbody {
-  width: 100%;
-}
-
-table.tableSection thead {
-  overflow-y: scroll;
-  display: table;
-  table-layout: fixed;
-  width: calc(100% - 16px); // assuming scrollbar width as 16px 
-}
-
-table.tableSection tbody {
-  overflow: auto;
-  height: 150px;
-  display: block;
-}
-
-table.tableSection tr {
-  width: 100%;
-  text-align: left;
-  display: table;
-  table-layout: fixed;
-}
-*/
-
-thead th { 
-  position: sticky; top: 0;
-  background-color: white; 
-}
-
-.scrolltable {
-    overflow-y:scroll;
-    height: 200px;
-} 
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
-
 </style>
   </head>
   <body>
@@ -142,7 +87,6 @@ thead th {
     <BR>
 	<font id="hint" size="3" color="grey"><I>click circle to change the root</I></font>
         <!--div class="hint">click or option-click to expand or collapse</div-->
-
     </body>
     
     <body>
@@ -248,15 +192,9 @@ document.getElementById('agreement').setAttribute('href', "./local.html?metric=a
 document.getElementById('legal').setAttribute('href', "./local.html?metric=legal&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
 document.getElementById('personal').setAttribute('href', "./local.html?metric=personal&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
 document.getElementById('full').setAttribute('href', "./local_full.html?metric=full&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
-
-
 // added year
 // document.getElementById('2013').setAttribute('href', "./local.html?metric=competition&year=2013&company=" + getParameterByName("company"))
 // document.getElementById('2014').setAttribute('href', "./local.html?metric=competition&year=2014&company=" + getParameterByName("company"))
-<<<<<<< HEAD
-
-=======
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
 if ( check_json_exists_target() ) {
 	var jsonData = $.ajax({
 		url: getJsonFileName(getParameterByName("company"), "forward"),
@@ -279,9 +217,8 @@ if ( check_json_exists_target() ) {
 else {
 	document.title = "Relationship Mapper is not ready for " + getParameterByName("company");
 	document.getElementById('hint').innerHTML = "";
-	document.getElementsByClassName('loading_message').innerHTML = "Data is not available for this company in this proximity measure.";
+	document.getElementById('loading_message').innerHTML = "Data is not available for this company in this proximity measure.";
 }
-
 // Tree 
 function addTree(direction, id, msg_id, m) {
   var w = 1280 - m[1] - m[3],
@@ -295,24 +232,9 @@ var diagonal = d3.svg.diagonal()
 var vis = d3.select(id).append("svg:svg")
     .attr("width", w + m[1] + m[3])
     .attr("height", h + m[0] + m[2])
-    // .on("wheel.zoom", true)
-    // .attr("viewBox", "0,0,400,400")
   .append("svg:g")
     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
-<<<<<<< HEAD
-
   rootJsonFileName = getJsonFileName(getParameterByName("company"), direction);
-
-=======
-if (direction == "forward") {
-  rootJsonFileName = getJsonFileName(getParameterByName("company"));
-} else {
-  // grab the JSON file associated with the backward tree
-  rootJsonFileName = getJsonFileName(getParameterByName("company"));
-  
-}
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
-
 d3.json(rootJsonFileName, function(json) {
 //d3.json(appJsonFile, function(error, json) {
   console.log(json);
@@ -326,7 +248,6 @@ d3.json(rootJsonFileName, function(json) {
 	    }
     }
   }
-
   root.x0 = h / 2;
   root.y0 = 0;
   function toggleAll(d) {
@@ -335,30 +256,19 @@ d3.json(rootJsonFileName, function(json) {
       toggle(d);
     }
   }
-
   if (direction == "forward") {
     // Initialize the display to show a few nodes.
     root.children.forEach(toggleAll);    
   }
-
   for(var i in root.children){
       toggle(root.children[i]);
   }
-<<<<<<< HEAD
   
   update(tree, root, vis, diagonal, direction, w);
-=======
-  //toggle(root.children[1].children[2]);
-  //toggle(root.children[9]);
-  //toggle(root.children[9].children[0]);
-  update(tree, root, vis, diagonal, direction, w);
-  // console.log("loading: " + document.getElementsByClassName('loading_message')[0].innerHTML);
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
   document.getElementById(msg_id).innerHTML = "";
 });  
 }
 addTree("forward", "#body", "loading_message_1", [20, 120, 20, 120]);
-
 function get_base_url(){
 	var base_url = "";
 	if (getParameterByName("metric") == "competition"){
@@ -413,7 +323,7 @@ function fileExists(url)
 {
     var http = new XMLHttpRequest();
     http.open('HEAD', url, false);
-    http.send();    
+    http.send();
     return http.status!=404;
 }
 function check_json_exists_target(){
@@ -429,7 +339,6 @@ function check_json_exists(d){
 	var url = json_path + d.permalink + ".json";
 	//console.log(url);
 	return fileExists(url);
-
 }
 function change_root(d, i){
 	if (d.permalink == getParameterByName("company")){
@@ -440,17 +349,11 @@ function change_root(d, i){
 	var url = json_path + d.permalink + ".json";
 	if (fileExists(url)){
 		window.location.href = base_url + d.permalink;
-
 	}
 	else{
 		console.log("no data for " + d.name);
 	}
-
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
 function update(tree, source, vis, diagonal, direction, w) {
   var duration = d3.event && d3.event.altKey ? 5000 : 500;
   var i = 0;
@@ -464,7 +367,6 @@ function update(tree, source, vis, diagonal, direction, w) {
     nodes.forEach(function(d) { d.y = (d.depth * 400); });
   }
   
-
   // Update the nodesâ¦
   var node = vis.selectAll("g.node")
       .data(nodes, function(d) { return d.id || (d.id = ++i); });
@@ -482,7 +384,6 @@ function update(tree, source, vis, diagonal, direction, w) {
             d.name + " was cited <B>" + d.reference_strength + " time(s) </B> in this filing <BR/>"
             + "and cited <B>" + d.relationship_strength + " time(s)</B> in a <B>" + d.relationship +"</B> context." +
             "<BR><BR> This citation was found in the <B>" + d.header +" </B> header of the 10-K filing"
-
             )
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY - 28) + "px");
@@ -498,8 +399,6 @@ function update(tree, source, vis, diagonal, direction, w) {
   var div = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
-
-
   //console.log(d_children);
   nodeEnter.append("svg:circle")
       .attr("r", 1e-6)
@@ -559,8 +458,6 @@ function update(tree, source, vis, diagonal, direction, w) {
       .style("fill", function(d) {
           return check_json_exists(d) ? "steelblue" : "black";})
       .style("fill-opacity", 1e-6);
-
-
   // Transition nodes to their new position.
   var nodeUpdate = node.transition()
       .duration(duration)
@@ -577,8 +474,6 @@ function update(tree, source, vis, diagonal, direction, w) {
       ;
   nodeUpdate.select("text")
       .style("fill-opacity", 1);
-
-
   
   // Transition exiting nodes to the parent's new position.
   var nodeExit = node.exit().transition()
@@ -620,7 +515,6 @@ function update(tree, source, vis, diagonal, direction, w) {
     d.y0 = d.y;
   });
 }
-
 // Toggle children.
 function toggle(d) {
   if (d.children) {
@@ -633,26 +527,13 @@ function toggle(d) {
     //console.log("expand:" + d.name);
   }
 }
-
-<<<<<<< HEAD
-
 // Returns an array of the valid years for the company
 function myAjax (callback) {
   var comp_name = getParameterByName("company");
   var metric = getParameterByName("metric");
   var results;
-
   $.ajax( { type : 'POST',
     data : {'company': comp_name, 'metric': metric},
-=======
-// Returns an array of the valid years for the company
-function myAjax (callback) {
-  var comp_name = getParameterByName("company");
-  var results;
-
-  $.ajax( { type : 'POST',
-    data : {'company': comp_name},
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
     url  : 'get_years.php',              // <=== CALL THE PHP FUNCTION HERE.
     success: function ( data ) {
       // alert( data );               // <=== VALUE RETURNED FROM FUNCTION.
@@ -662,76 +543,12 @@ function myAjax (callback) {
     error: function ( xhr ) {
       alert( "error" );
     }
-<<<<<<< HEAD
-=======
   });
 }
-
 function populateYearMenu(years) {
-
-  // https://stackoverflow.com/questions/27769763/populating-a-html-dropdown-menu-through-a-javascript-function
-  // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
   var dropdown = document.getElementById("year-menu");
   // console.log("dropdown" + dropdown);
   var i, newOption, newLink, newLink;
-
-  // first need to clear out the dropdown or else subsequent clicks
-  // will cause the list to be too long
-  while (dropdown.firstChild) {
-    dropdown.removeChild(dropdown.firstChild);
-  }
-  
-  for (i = 0; i < years.length; i++) {
-      newOption = document.createElement("li");
-      // newOption.textContent = years[i];
-      newLink = document.createElement("a");
-      newLink.textContent = years[i];
-      newLink.href = "./local_full.html?metric=full&year=" + years[i] + "&company=" + getParameterByName("company");
-      newOption.appendChild(newLink);
-      dropdown.appendChild(newOption);
-  }
-}
-
-
-$(function() {
-
-
-var people = [];
-// console.log("json path:" + get_json_path() + year + "/" + getParameterByName("company"));
-$.getJSON(get_json_path() + year + "/" + getParameterByName("company") + ".json", function(data) {   
-  //  console.log("length: " + data.children.length);
-   var children_text = "";
-   tbody = $('<tbody>');
-   $(tbody).appendTo("#userdata");
-       for (var i = 0; i < data.children.length; i++) {
-         tr = $('<tr/>');
-         tr.append("<td>" + data.name + "</td>");
-         tr.append("<td>" + data.year + "</td>");
-                    
-         // children_text = children_text + data.children[i].name + ", ";
-         tr.append("<td>" + data.children[i].name + "</td>");
-         // tr.append("<td>" + data.children[i].item + "</td>");
-         children_text = children_text.substring(0, children_text.length-2); 
-         
-         $('table').append(tr);
-         $(tr).appendTo("#userdata");
-         
-       }
-    tbody = $('</tbody>');
-    $(tbody).appendTo("#userdata");
-       // var tblRow = "<tr>" + "<td>" + f.name + "</td>" +
-       //  "<td>" + f.year + "</td>" + "<td>" + f.children + "</td>" + "</tr>"
-       //  $(tblRow).appendTo("#userdata tbody");
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
-  });
-}
-
-function populateYearMenu(years) {
-
-  var dropdown = document.getElementById("year-menu");
-  // console.log("dropdown" + dropdown);
-  var i, newOption, newLink, newLink;
-
   // first need to clear out the dropdown or else subsequent clicks
   // will cause the list to be too long
   while (dropdown.firstChild) {
@@ -748,7 +565,6 @@ function populateYearMenu(years) {
       dropdown.appendChild(newOption);
   }
 }
-
 function populateTable(id, direction) {
   var people = [];
   // console.log("json path:" + get_json_path() + year + "/" + getParameterByName("company"));
@@ -784,14 +600,11 @@ function populateTable(id, direction) {
         //  $(tblRow).appendTo("#userdata tbody");
     });
 }
-
 populateTable("#userdata", "forward");
 populateTable("#cited-data", "backward")
-
 </script></body>
 
 
-<<<<<<< HEAD
 
 <head>
   <style>
@@ -855,7 +668,6 @@ populateTable("#cited-data", "backward")
     document.getElementsByClassName('footer_text')[i].innerHTML = companyName;
     document.getElementsByClassName('footer_year')[i].innerHTML = year;
   }  
-
 </script>
 <div class="scrolltable">
     <table id= "cited-data" class="tableSection">
@@ -879,35 +691,4 @@ populateTable("#cited-data", "backward")
 
 
 
-
-
-
 </html>
-=======
-;
-
-    </script>
-
-    <div class="scrolltable">
-      <table id= "userdata" class="tableSection" border="2">
-        <thead>
-                  <th>name</th>
-                  <th>year</th>
-                  <th>children</th>
-                  <th>item</th>
-              </thead>
-      </table>
-    </div>
-    <div id="bottomTree">
-      <h2 align="center" id="loading_message_2">Data is loading... </h2>
-      <div id="footer">
-      </div>
-    </div>
-    <script type="text/javascript">
-      addTree("backward", "#bottomTree", "loading_message_2",
-        [20, 700, 20, 120]);
-    </script>
-  </body>
-  
-</html>
->>>>>>> 7323a5c11edce577f2b769d4e5c7da5463a1763a
