@@ -178,7 +178,26 @@ $(document).ready(function() {
     }
   } );
  
+
+
   oTable.fnFilter(searchText);
+  
+  // remove duplicates from table
+  var permalinks = [];
+  var data = oTable.fnGetData();
+  console.log("data: " + data);
+  // oTable.api().rows().every(function(rowIdx, tableLoop, rowLoop) {
+  //   permalink = this.data().Permalink;
+  //   if (~permalinks.indexOf(permalink)) {
+  //     this.nodes().to$().attr('excluded', 'true')
+  //   } else {
+  //     permalinks.push(permalink) 
+  //   }
+  // })
+  // $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+  //   return table.row(dataIndex).nodes().to$().attr('excluded') != 'true'
+  // })
+
   //$("#search input").val(searchText);
   //$("#search input").val(searchBoxInitText);
   checkToHideSearch();

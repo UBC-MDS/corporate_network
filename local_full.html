@@ -43,8 +43,8 @@ thead th {
 div.tooltip {
     position: absolute;
     text-align: left;
-    width: 300px;
-    height: 225px;
+    width: 250px;
+    height: 230px;
     padding: 5px;
     font: 12px sans-serif;
     background: lightsteelblue;
@@ -64,19 +64,19 @@ div.tooltip {
   </font><BR><BR>
 	<font size="4">
     <div class="dropdown">
-        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Relationship Type
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" onclick="typeAjax(populateTypeMenu)">Relationship Type
         <span class="caret"></span></button>
-        <ul class="dropdown-menu">
-            <li><a id="competition" href="">Competition</a></li>
+        <ul class="dropdown-menu" id="type-menu">
+            <!-- <li><a id="competition" href="">Competition</a></li>
             <li><a id="ownership" href="">Ownership</a></li>
             <li><a id="agreement" href="">Agreements</a></li>
             <li><a id="legal" href="">Legal Suits</a></li>
             <li><a id="personal" href="">Personal Ties</a></li>
-            <li><a id="full" href="">All Relationships</a></li>
+            <li><a id="full" href="">All Relationships</a></li> -->
         </ul>
     </div> 
     <div class="dropdown">
-            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" onclick="myAjax(populateYearMenu)">Filing Year
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" onclick="yearAjax(populateYearMenu)">Filing Year
             <span class="caret"></span></button>
             <ul class="dropdown-menu" id="year-menu">
             </ul>
@@ -185,12 +185,12 @@ else if (getParameterByName("metric") == "personal"){
 }
 var year = getParameterByName("year");
 // proximity
-document.getElementById('competition').setAttribute('href', "./local.html?metric=competition&year="+ getParameterByName("year") +"&company=" + getParameterByName("company"));
-document.getElementById('ownership').setAttribute('href', "./local.html?metric=ownership&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
-document.getElementById('agreement').setAttribute('href', "./local.html?metric=agreement&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
-document.getElementById('legal').setAttribute('href', "./local.html?metric=legal&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
-document.getElementById('personal').setAttribute('href', "./local.html?metric=personal&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
-document.getElementById('full').setAttribute('href', "./local_full.html?metric=full&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
+// document.getElementById('competition').setAttribute('href', "./local.html?metric=competition&year="+ getParameterByName("year") +"&company=" + getParameterByName("company"));
+// document.getElementById('ownership').setAttribute('href', "./local.html?metric=ownership&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
+// document.getElementById('agreement').setAttribute('href', "./local.html?metric=agreement&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
+// document.getElementById('legal').setAttribute('href', "./local.html?metric=legal&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
+// document.getElementById('personal').setAttribute('href', "./local.html?metric=personal&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
+// document.getElementById('full').setAttribute('href', "./local_full.html?metric=full&year=" + getParameterByName("year") +"&company=" + getParameterByName("company"));
 if ( check_json_exists_target() ) {
 	var jsonData = $.ajax({
 		url: getJsonFileName(getParameterByName("company"), "forward"),
@@ -206,7 +206,7 @@ if ( check_json_exists_target() ) {
 else {
 	document.title = "Relationship Mapper is not ready for " + getParameterByName("company");
 	document.getElementById('hint').innerHTML = "";
-	document.getElementById('loading_message_1').innerHTML = "Data is not available for this company in this proximity measure.";
+	document.getElementById('loading_message_1').innerHTML = "Data is not available for this company in this proximity measure. <br/> Please check filing year.";
 }
 // Tree 
 function addTree(direction, id, msg_id, m) {
@@ -228,6 +228,36 @@ var vis = d3.select(id).append("svg:svg")
     // .attr("viewBox", "0,0,400,400")
   .append("svg:g")
     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+  vis.append("svg:defs").selectAll("marker") //
+    .data(["end"]) // Different link/path types can be defined here
+    .enter().append("svg:marker") // This section adds in the arrows
+    .attr("id", String)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 20)
+    .attr("refY", 0)
+    .attr("markerWidth", 3)
+    .attr("markerHeight", 3)
+    .attr("orient", "auto")
+    .attr("stroke", "#000")
+    .attr("fill", "gray")
+    .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5")
+    .style("stroke-width", "0.3px");
+  vis.append("svg:defs").selectAll("marker") //
+    .data(["start"]) // Different link/path types can be defined here
+    .enter().append("svg:marker") // This section adds in the arrows
+    .attr("id", String)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 20)
+    .attr("refY", 0)
+    .attr("markerWidth", 3)
+    .attr("markerHeight", 3)
+    .attr("orient", "auto-start-reverse")
+    .attr("stroke", "#000")
+    .attr("fill", "gray")
+    .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5")
+    .style("stroke-width", "0.3px");    
   rootJsonFileName = getJsonFileName(getParameterByName("company"), direction);
 d3.json(rootJsonFileName, function(json) {
 //d3.json(appJsonFile, function(error, json) {
@@ -265,7 +295,7 @@ d3.json(rootJsonFileName, function(json) {
   document.getElementById(msg_id).innerHTML = "";
 });  
 }
-addTree("forward", "#body", "loading_message_1", [20, 120, 20, 120]);
+addTree("forward", "#body", "loading_message_1", [20, 120, 20, 250]);
 function get_base_url(){
 	var base_url = "";
 	if (getParameterByName("metric") == "competition"){
@@ -292,6 +322,7 @@ function get_base_url(){
 	return base_url;
 }
 function get_json_path(){
+  var year = getParameterByName("year");
 	var json_path = " ";
         if (getParameterByName("metric") == "competition"){
                 json_path = "./json.competition/converted/";
@@ -314,7 +345,7 @@ function get_json_path(){
         else {
                 json_path = "./json/";
         }
-        return json_path;
+        return json_path + year;
 }
 function fileExists(url)
 {
@@ -326,14 +357,14 @@ function fileExists(url)
 function check_json_exists_target(){
         var base_url = get_base_url();
         var json_path = get_json_path();
-        var url = json_path + getParameterByName("company") + ".json";
+        var url = json_path + "/filed/" + getParameterByName("company") + ".json";
         //console.log(url);
         return fileExists(url);
 }
 function check_json_exists(d){
 	var base_url = get_base_url();
 	var json_path = get_json_path();
-	var url = json_path + d.permalink + ".json";
+	var url = json_path + "/filed/" + d.permalink + ".json";
 	//console.log(url);
 	return fileExists(url);
 }
@@ -343,7 +374,7 @@ function change_root(d, i){
 	}
 	var base_url = get_base_url();
 	var json_path = get_json_path();
-	var url = json_path + d.permalink + ".json";
+	var url = json_path + "/filed/"+d.permalink + ".json";
 	if (fileExists(url)){
 		window.location.href = base_url + d.permalink;
 	}
@@ -368,25 +399,55 @@ function update(tree, source, vis, diagonal, direction, w) {
   var node = vis.selectAll("g.node")
       .data(nodes, function(d) { return d.id || (d.id = ++i); })
       ;
-
+  var filer_name = '';
+  var citer_name = '';
+  var item_text = '';
+  var sent_slice = '';
+  var tooltip_text = '';
   // Enter any new nodes at the parent's previous position.
   var nodeEnter = node.enter().append("svg:g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
       .on("click", change_root)
       .on("mouseover", function(d) {
-        div.transition()
+        if (typeof d.cited_by != 'undefined') {
+          if (direction == 'forward') {
+            filer_name = d.cited_by;
+            cited_name = d.name;
+          } else {
+            if (getParameterByName("metric") != "full") {
+              cited_name = d.parent.name;
+            } else {
+              cited_name = d.cited_by;
+            }
+            filer_name = d.name;            
+          }
+          if (typeof d.item != 'undefined') {
+            // handle case of 1st degree relationships
+            item_text = d.item.replace("_", " ");
+            sent_slice = d.sentence.slice(0,250);
+            tooltip_text = "<B>"+ cited_name + "</B> was cited by <B>" + filer_name + " <BR>"+ d.reference_strength 
+            + " time(s) </B> in this filing and cited <B>" + d.relationship_strength + " time(s)</B> in a <B>" + d.relationship +"</B> context." +
+            "<BR><BR> This citation was found in the <B>" + d.header +" </B> header of the 10-K filing in <B>" + item_text + "</B>.<BR><BR>" +
+            "Sentence in reference: <BR> <B>" + sent_slice + "..";
+          } else {
+            // handle case of 2nd degree relationships
+            item_text = '';
+            sent_slice = '';
+            tooltip_text = "<B>"+ cited_name + "</B> was cited by <B>" + filer_name + " <BR>"+ d.reference_strength 
+            + " time(s) </B> in this filing and cited <B>" + d.relationship_strength + " time(s)</B> in a <B>" + d.relationship +"</B> context.";
+          }
+          div.transition()
           .duration(200)
           .style("opacity", .9);
-        div.html(
+          div.html(
             // "Relationship: " + d.relationship.charAt(0).toUpperCase() + d.relationship.slice(1)+ "<br/>" +
-            "<B>"+d.name + "</B> was cited by <B>" + d.cited_by + " <BR>"+ d.reference_strength 
-            + " time(s) </B> in this filing and cited <B>" + d.relationship_strength + " time(s)</B> in a <B>" + d.relationship +"</B> context." +
-            "<BR><BR> This citation was found in the <B>" + d.header +" </B> header of the 10-K filing. <BR><BR>" +
-            "Sentence in reference: <BR> <B>" + d.sentence
+            tooltip_text
             )
           .style("left", (d3.event.pageX) + "px")
-          .style("top", (d3.event.pageY - 28) + "px");
+          .style("top", (d3.event.pageY - 28) + "px");          
+        }
+
         })
       .on("mouseout", function(d) {
         div.transition()
@@ -504,6 +565,12 @@ function update(tree, source, vis, diagonal, direction, w) {
   // Update the linksâ¦
   var link = vis.selectAll("path.link")
       .data(tree.links(nodes), function(d) { return d.target.id; });
+  var marker_type = "";  
+  if (direction == "forward") {
+    marker_type = 'end';
+  } else {
+    marker_type = 'start';
+  }        
   // Enter any new links at the parent's previous position.
   link.enter().insert("svg:path", "g")
       .attr("class", "link")
@@ -511,6 +578,7 @@ function update(tree, source, vis, diagonal, direction, w) {
         var o = {x: source.x0, y: source.y0};
         return diagonal({source: o, target: o});
       })
+    .attr('marker-' + marker_type, "url(#" + marker_type + ")")
     .transition()
       .duration(duration)
       .attr("d", diagonal);
@@ -544,8 +612,29 @@ function toggle(d) {
     //console.log("expand:" + d.name);
   }
 }
+
+// Returns an array of the valid types for the company
+function typeAjax (callback) {
+  var comp_name = getParameterByName("company");
+  var year = getParameterByName("year");
+  var results;
+
+  $.ajax( { type : 'POST',
+    data : {'company': comp_name, 'year': year},
+    url  : 'get_relationship_types.php',              // <=== CALL THE PHP FUNCTION HERE.
+    success: function ( data ) {
+      // alert( data );               // <=== VALUE RETURNED FROM FUNCTION.
+      results = jQuery.parseJSON(data);       
+      callback(results);
+    },
+    error: function ( xhr ) {
+      alert( "error" );
+    }
+  });
+}
+
 // Returns an array of the valid years for the company
-function myAjax (callback) {
+function yearAjax (callback) {
   var comp_name = getParameterByName("company");
   var metric = getParameterByName("metric");
   var results;
@@ -565,7 +654,7 @@ function myAjax (callback) {
 function populateYearMenu(years) {
   var dropdown = document.getElementById("year-menu");
   // console.log("dropdown" + dropdown);
-  var i, newOption, newLink, newLink;
+  var i, newOption, newLink;
   // first need to clear out the dropdown or else subsequent clicks
   // will cause the list to be too long
   while (dropdown.firstChild) {
@@ -582,6 +671,36 @@ function populateYearMenu(years) {
       dropdown.appendChild(newOption);
   }
 }
+
+function populateTypeMenu(types) {
+  var dropdown = document.getElementById("type-menu");
+  // console.log("dropdown" + dropdown);
+  var i, newOption, newLink;
+  var relationships = { 'Agreements': 'agreement', 'Competition': 'competition', '(All Relationships)': 'full', 'Legal Suits': 'legal', 'Ownership': 'ownership', 'Personal Ties': 'personal'};
+  var page_type = '';
+
+  // first need to clear out the dropdown or else subsequent clicks
+  // will cause the list to be too long
+  while (dropdown.firstChild) {
+    dropdown.removeChild(dropdown.firstChild);
+  }
+  
+  for (i = 0; i < types.length; i++) {
+      newOption = document.createElement("li");
+      // newOption.textContent = years[i];
+      newLink = document.createElement("a");
+      newLink.textContent = types[i];
+      if (types[i] != '(All Relationships)') {
+        page_type = 'local';
+      } else {
+        page_type = 'local_full';
+      }
+      newLink.href = "./" + page_type + ".html?metric=" + relationships[types[i]] + "&year=" + getParameterByName("year") + "&company=" + getParameterByName("company");
+      newOption.appendChild(newLink);
+      dropdown.appendChild(newOption);
+  }
+}
+
 function populateTable(id, direction) {
   var people = [];
   // console.log("json path:" + get_json_path() + year + "/" + getParameterByName("company"));
@@ -620,7 +739,7 @@ function populateTable(id, direction) {
           console.log("accession: " + accession);
           try {
             clean_accession = accession.replace(/-/g, "");
-            tr.append("<td><a href='https://www.sec.gov/Archives/edgar/data/" + clean_accession + "/" + accession + "-index.htm'>" + name + "</a></td>");
+            tr.append("<td><a href='https://www.sec.gov/Archives/edgar/data/" + clean_accession + "/" + accession + "-index.htm' target='blank'>" + name + "</a></td>");
           } catch (e) {
             tr.append("<td> No Link Available </td>");
           }
@@ -701,7 +820,7 @@ populateTable("#cited-data", "backward");
       </div>
       <script type="text/javascript">
         addTree("backward", "#bottomTree", "loading_message_2",
-          [20, 700, 20, 120]);
+          [20, 600, 20, 120]);
         var i;
         // console.log("length of footer_metric array: " + document.getElementsByClassName("footer_metric").length);
         for (i = 0; i < document.getElementsByClassName('footer_metric').length; i++) {

@@ -40,10 +40,10 @@ function getValidYears($dirs, $company, &$results = array()) {
         // var_dump($value);
         // var_dump($year);
         $test_path = $value . '/' . $company . '.json';
-        $test_cited_path = $value . '/cited/' . $company . '.json';
+        // $test_cited_path = $value . '/cited/' . $company . '.json';
         $test_filed_path = $value . '/filed/' . $company . '.json';
         // var_dump($test_path);
-        if (file_exists($test_cited_path) || file_exists($test_filed_path) || file_exists($test_path)) {            
+        if (file_exists($test_filed_path)) {            
             $results[] = $year;
         }
     }

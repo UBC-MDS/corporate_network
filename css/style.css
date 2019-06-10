@@ -87,13 +87,17 @@ line {
   color: #1181B8;
 }
 
-a:link, a:visited {
+/* a:link, a:visited {
   color: #000;
   text-decoration: none;
-}
+} */
 
 a:hover {
   color: #666;
+}
+
+td > a {
+  color: blue;
 }
 
 .hint {
