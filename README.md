@@ -2,6 +2,7 @@ https://misr.sauder.ubc.ca/corporate_network/
 
 Hidden JSON repo structure:
 
+```
 corporate_network/
 ├── json.agreement/       <- contains all agreement JSON dictionaries with only **agreement** relationships, to the 2nd degree
 ├── json.full/           <- contains JSON dictionaries with **all relationships**, to the 1st degree
@@ -25,5 +26,6 @@ corporate_network/
 ├── network.datatable.full.json       <- Data from third party sources.
 ├── ...
 
+```
 
 
